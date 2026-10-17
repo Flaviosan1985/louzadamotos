@@ -1,77 +1,89 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Facebook, Instagram } from "lucide-react";
-
-const footerLinks = [
-  { href: "/", label: "Início" },
-  { href: "/motos", label: "Motos" },
-  { href: "/autos", label: "Autos" },
-  { href: "/sobre", label: "Sobre" },
-  { href: "/contato", label: "Contato" },
-];
+import { AtSign, Mail, MapPin } from "lucide-react";
 
 export function StoreFooter() {
   return (
-    <footer className="relative mt-auto border-t border-white/10 bg-zinc-950 text-zinc-300">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
-        <div>
-          <Image
-            src="/logo.jpg"
-            alt="Louzada Motos"
-            width={160}
-            height={64}
-            className="mb-4 h-14 w-auto object-contain"
-          />
-          <p className="text-sm leading-relaxed text-zinc-400">
-            Motos e autos selecionados, atendimento direto e condições especiais na região.
-          </p>
-        </div>
+    <footer className="border-t border-[#1f1f1f] bg-[#080808]">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mb-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="lg:col-span-2">
+            <div className="mb-4 flex items-center gap-3">
+              <Image
+                src="/logo.jpg"
+                alt="Louzada Motos"
+                width={44}
+                height={44}
+                className="rounded-full"
+              />
+              <div>
+                <p className="font-display text-lg leading-none font-black text-white italic">
+                  LOU<span className="text-[#c41e3a]">ZADA</span> MOTOS
+                </p>
+                <p className="text-[10px] tracking-widest text-[#555] uppercase">Motos & Autos</p>
+              </div>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed text-[#666]">
+              Loja de motos e automóveis com estoque online, atendimento humano e negociação
+              transparente.
+            </p>
+          </div>
 
-        <div>
-          <p className="mb-3 text-xs font-semibold tracking-[0.2em] text-white uppercase">
-            Navegação
-          </p>
-          <ul className="space-y-2 text-sm">
-            {footerLinks.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="hover:text-[#c41e3a]">
-                  {link.label}
-                </Link>
+          <div>
+            <p className="mb-4 text-xs font-bold tracking-widest text-white uppercase">Navegação</p>
+            <ul className="space-y-2 text-sm">
+              {[
+                { href: "/#estoque", label: "Estoque" },
+                { href: "/motos", label: "Motos" },
+                { href: "/autos", label: "Autos" },
+                { href: "/#sobre", label: "Sobre" },
+                { href: "/#contato", label: "Contato" },
+              ].map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="text-[#666] transition-colors hover:text-[#c41e3a]">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="mb-4 text-xs font-bold tracking-widest text-white uppercase">Contato</p>
+            <ul className="space-y-3 text-sm text-[#666]">
+              <li className="flex items-start gap-2">
+                <MapPin size={14} className="mt-0.5 shrink-0 text-[#c41e3a]" />
+                Av. Principal, 1200 — Centro
               </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <p className="mb-3 text-xs font-semibold tracking-[0.2em] text-white uppercase">
-            Contato
-          </p>
-          <p className="text-sm">Av. Principal, 1200 — Centro</p>
-          <p className="text-sm">Seg–Sex 9h–18h · Sáb 9h–13h</p>
-          <div className="mt-4 flex gap-3">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-white/20 p-2 hover:border-[#c41e3a] hover:text-[#c41e3a]"
-              aria-label="Instagram"
-            >
-              <Instagram className="size-4" />
-            </a>
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full border border-white/20 p-2 hover:border-[#c41e3a] hover:text-[#c41e3a]"
-              aria-label="Facebook"
-            >
-              <Facebook className="size-4" />
-            </a>
+              <li>
+                <a
+                  href="mailto:contato@louzadamotos.com.br"
+                  className="flex items-center gap-2 transition-colors hover:text-white"
+                >
+                  <Mail size={14} className="text-[#c41e3a]" />
+                  contato@louzadamotos.com.br
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 transition-colors hover:text-white"
+                >
+                  <AtSign size={14} className="text-[#c41e3a]" />
+                  @louzadamotos
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-zinc-500">
-        © {new Date().getFullYear()} Louzada Motos. Todos os direitos reservados.
+
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[#1f1f1f] pt-8 sm:flex-row">
+          <p className="text-xs text-[#444]">
+            © {new Date().getFullYear()} Louzada Motos · Todos os direitos reservados.
+          </p>
+        </div>
       </div>
     </footer>
   );

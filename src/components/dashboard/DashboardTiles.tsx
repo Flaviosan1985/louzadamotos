@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { BarChart3, Car, Contact, Settings, Wallet } from "lucide-react";
 
 const tiles = [
@@ -15,14 +15,14 @@ export function DashboardTiles() {
       {tiles.map((tile) => {
         const Icon = tile.icon;
         return (
-          <Link
+          <PanelLink
             key={tile.href}
             href={tile.href}
             className="bg-card hover:border-primary/40 flex flex-col items-center gap-3 rounded-xl border px-6 py-8 text-center shadow-sm transition"
           >
             <Icon className="text-muted-foreground size-8" />
             <span className="text-sm font-medium">{tile.label}</span>
-          </Link>
+          </PanelLink>
         );
       })}
     </section>

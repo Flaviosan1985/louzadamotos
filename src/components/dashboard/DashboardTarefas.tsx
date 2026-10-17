@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { ListTodo } from "lucide-react";
 import type { Tarefa } from "@/lib/negocio/tarefas";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export function DashboardTarefas({ tarefas }: { tarefas: Tarefa[] }) {
         <ul className="divide-y">
           {tarefas.map((t) => (
             <li key={t.id}>
-              <Link href={t.href} className="hover:bg-muted/50 -mx-2 flex items-start gap-3 rounded-md px-2 py-2.5">
+              <PanelLink href={t.href} className="hover:bg-muted/50 -mx-2 flex items-start gap-3 rounded-md px-2 py-2.5">
                 <span
                   className={cn(
                     "mt-1.5 size-2 shrink-0 rounded-full",
@@ -36,7 +36,7 @@ export function DashboardTarefas({ tarefas }: { tarefas: Tarefa[] }) {
                 <time className="text-muted-foreground shrink-0 text-xs tabular-nums" dateTime={t.quando.toISOString()}>
                   {hora.format(t.quando)}
                 </time>
-              </Link>
+              </PanelLink>
             </li>
           ))}
         </ul>

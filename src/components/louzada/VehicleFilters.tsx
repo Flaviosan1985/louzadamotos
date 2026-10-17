@@ -2,13 +2,14 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 type VehicleFiltersProps = {
   brands: string[];
   basePath: string;
 };
+
+const fieldClass =
+  "h-11 w-full rounded-xl border border-[#2a2a2a] bg-[#141414] px-3 text-sm text-white placeholder:text-[#555] focus:border-[#c41e3a]/50 focus:outline-none";
 
 export function VehicleFilters({ brands, basePath }: VehicleFiltersProps) {
   const router = useRouter();
@@ -20,23 +21,24 @@ export function VehicleFilters({ brands, basePath }: VehicleFiltersProps) {
     if (value) params.set(field, value);
     else params.delete(field);
     startTransition(() => {
-      router.push(`${basePath}?${params.toString()}`);
+      router.push(`${basePath}?${params.toString()}`, { scroll: false });
     });
   }
 
   return (
     <form
-      className="mb-6 grid gap-3 md:grid-cols-2 lg:grid-cols-5"
+      className="mb-8 grid gap-3 md:grid-cols-2 lg:grid-cols-5"
       onSubmit={(e) => e.preventDefault()}
     >
-      <Input
+      <input
+        className={fieldClass}
         placeholder="Buscar marca, modelo..."
         defaultValue={searchParams.get("q") ?? ""}
         onChange={(e) => update("q", e.target.value)}
         aria-label="Busca"
       />
       <select
-        className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm"
+        className={fieldClass}
         value={searchParams.get("brand") ?? ""}
         onChange={(e) => update("brand", e.target.value)}
         aria-label="Marca"
@@ -48,21 +50,23 @@ export function VehicleFilters({ brands, basePath }: VehicleFiltersProps) {
           </option>
         ))}
       </select>
-      <Input
+      <input
         type="number"
+        className={fieldClass}
         placeholder="Preço mín."
         defaultValue={searchParams.get("minPrice") ?? ""}
         onChange={(e) => update("minPrice", e.target.value)}
         aria-label="Preço mínimo"
       />
-      <Input
+      <input
         type="number"
+        className={fieldClass}
         placeholder="Preço máx."
         defaultValue={searchParams.get("maxPrice") ?? ""}
         onChange={(e) => update("maxPrice", e.target.value)}
         aria-label="Preço máximo"
       />
-      <label className="flex items-center gap-2 text-sm text-zinc-700">
+      <label className="flex h-11 items-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#141414] px-3 text-sm text-[#aaa]">
         <input
           type="checkbox"
           className="size-4 accent-[#c41e3a]"
@@ -71,11 +75,7 @@ export function VehicleFilters({ brands, basePath }: VehicleFiltersProps) {
         />
         Ocultar vendidos
       </label>
-      {pending ? (
-        <Button type="button" variant="outline" disabled className="lg:col-span-5">
-          Filtrando…
-        </Button>
-      ) : null}
+      {pending ? <p className="text-xs text-[#666] lg:col-span-5">Filtrando…</p> : null}
     </form>
   );
 }

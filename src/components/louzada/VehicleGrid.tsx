@@ -9,7 +9,7 @@ type VehicleGridProps = {
 export function VehicleGrid({ vehicles, emptyMessage }: VehicleGridProps) {
   if (!vehicles.length) {
     return (
-      <p className="py-8 text-center text-sm text-zinc-500">
+      <p className="py-8 text-center text-sm text-[#666]">
         {emptyMessage ?? "Nenhum veículo encontrado com os filtros atuais."}
       </p>
     );

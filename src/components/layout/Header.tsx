@@ -1,11 +1,9 @@
 "use client";
 
 import { Fragment } from "react";
-import { usePathname } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -13,15 +11,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AccountMenu } from "@/components/layout/AccountMenu";
-
-const SECTION_HREFS: Record<string, string> = {
-  "/cadastros": "/cadastros/usuarios",
-  "/veiculos": "/veiculos/a-venda",
-  "/financeiro": "/financeiro/resumo",
-  "/relatorios": "/relatorios/estatisticas",
-  "/configuracoes": "/configuracoes/impressos",
-  "/atalhos": "/atalhos/agenda",
-};
+import { PanelLink } from "@/components/layout/panel/PanelLink";
+import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
+import { SECTION_HREFS } from "@/lib/panel/paths";
 
 const LABELS: Record<string, string> = {
   sistema: "Painel",
@@ -73,7 +65,7 @@ const LABELS: Record<string, string> = {
 };
 
 export function Header() {
-  const pathname = usePathname();
+  const { pathname } = usePanelNav();
   const segments = pathname.split("/").filter(Boolean);
 
   return (
@@ -101,7 +93,9 @@ export function Header() {
                         {isLast ? (
                           <BreadcrumbPage>{label}</BreadcrumbPage>
                         ) : (
-                          <BreadcrumbLink href={href}>{label}</BreadcrumbLink>
+                          <PanelLink href={href} className="hover:text-foreground transition-colors">
+                            {label}
+                          </PanelLink>
                         )}
                       </BreadcrumbItem>
                       {!isLast ? <BreadcrumbSeparator /> : null}

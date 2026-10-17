@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { toast } from "sonner";
 import { removeVeiculo } from "@/lib/data/app-data";
 import { filterVeiculos, uniqueMarcas } from "@/lib/veiculos/filter-veiculos";
@@ -86,10 +86,12 @@ export function VeiculosPage({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" render={<Link href="/" />}>
+            <Button variant="outline" nativeButton={false} render={<PanelLink href="/" />}>
               Ver vitrine
             </Button>
-            <Button render={<Link href="/veiculos/adicionar" />}>Adicionar veículo</Button>
+            <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
+              Adicionar veículo
+            </Button>
           </div>
         </div>
         {data ? (
@@ -99,7 +101,11 @@ export function VeiculosPage({
           <EmptyState
             title="Nenhum veículo neste filtro"
             description="Ajuste a busca, o status ou cadastre um veículo no pátio."
-            action={<Button render={<Link href="/veiculos/adicionar" />}>Adicionar veículo</Button>}
+            action={
+              <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
+                Adicionar veículo
+              </Button>
+            }
           />
         </QueryState.Empty>
         <QueryState.Success>

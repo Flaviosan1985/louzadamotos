@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 import { toast } from "sonner";
 import { loadAppSnapshot, saveVeiculo, uploadPublicFile } from "@/lib/data/app-data";
 import { STATUS_VEICULO, TIPOS_VEICULO } from "@/lib/constants";
@@ -19,7 +19,7 @@ import {
 const currentYear = new Date().getFullYear();
 
 export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
-  const router = useRouter();
+  const { navigate } = usePanelNav();
   const [loading, setLoading] = useState(Boolean(veiculoId));
   const [saving, setSaving] = useState(false);
   const [tenantId, setTenantId] = useState("");
@@ -129,7 +129,7 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
       };
       const saved = await saveVeiculo(payload, demo);
       toast.success(veiculoId ? "Veículo atualizado." : "Veículo cadastrado.");
-      router.push(saved.status === "vendido" ? "/veiculos/vendidos" : "/veiculos/a-venda");
+      navigate(saved.status === "vendido" ? "/veiculos/vendidos" : "/veiculos/a-venda");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar.");
     } finally {
@@ -248,7 +248,7 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
         ) : null}
       </FormField>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" onClick={() => window.history.back()}>
           Cancelar
         </Button>
         <Button type="submit" disabled={saving}>

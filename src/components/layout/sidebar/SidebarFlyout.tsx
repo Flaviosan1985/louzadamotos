@@ -7,7 +7,6 @@
  */
 
 import { type ComponentType } from "react";
-import Link from "next/link";
 import * as Icon from "lucide-react";
 import { ChevronRightIcon } from "lucide-react";
 import type { MenuItem, MenuLeafSubItem, MenuSubItem } from "@/configs/navConfig";
@@ -26,12 +25,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 
 function FlyoutLink({ item, isActive }: { item: MenuLeafSubItem; isActive: boolean }) {
   return (
     <DropdownMenuItem
       className={cn("justify-between gap-2", isActive && "bg-primary/10 text-accent-foreground font-medium")}
-      render={<Link href={item.href} />}
+      render={<PanelLink href={item.href} />}
     >
       <span className="truncate">{item.label}</span>
     </DropdownMenuItem>

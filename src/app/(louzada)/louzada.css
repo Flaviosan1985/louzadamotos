@@ -1,0 +1,28 @@
+.louzada-store {
+  --louzada-bg: #0a0a0a;
+  --louzada-surface: #141414;
+  --louzada-surface-2: #1c1c1c;
+  --louzada-border: #2a2a2a;
+  --louzada-muted: #888888;
+  --louzada-red: #c41e3a;
+  --louzada-red-dark: #a01830;
+  --louzada-red-light: #e52222;
+  background: var(--louzada-bg);
+  color: #fff;
+  scroll-behavior: smooth;
+}
+
+.louzada-store .font-display {
+  font-family: var(--font-barlow), Arial, Helvetica, sans-serif;
+}
+
+.louzada-store ::-webkit-scrollbar {
+  width: 4px;
+}
+.louzada-store ::-webkit-scrollbar-track {
+  background: var(--louzada-bg);
+}
+.louzada-store ::-webkit-scrollbar-thumb {
+  background: var(--louzada-red);
+  border-radius: 2px;
+}

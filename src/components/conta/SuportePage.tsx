@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { Button } from "@/components/ui/button";
 import { QueryState } from "@/components/shared/QueryState";
@@ -30,7 +30,7 @@ export function SuportePage() {
           ) : (
             <p className="text-muted-foreground text-sm">Nenhum telefone cadastrado nas propriedades da loja.</p>
           )}
-          <Button nativeButton={false} render={<Link href="/configuracoes/tutorial" />}>
+          <Button nativeButton={false} render={<PanelLink href="/configuracoes/tutorial" />}>
             Abrir tutorial
           </Button>
         </div>

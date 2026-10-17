@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { QueryState } from "@/components/shared/QueryState";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -72,7 +72,7 @@ export function CadastroPendentePage() {
                       <TableCell>{item.renavam ?? "Falta"}</TableCell>
                       <TableCell>{item.fotos.length}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" render={<Link href={`/veiculos/${item.id}`} />}>
+                        <Button variant="ghost" size="sm" nativeButton={false} render={<PanelLink href={`/veiculos/${item.id}`} />}>
                           Completar
                         </Button>
                       </TableCell>

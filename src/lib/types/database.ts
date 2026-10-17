@@ -99,9 +99,10 @@ export interface Database {
       };
       clientes: {
         Row: Cliente;
-        Insert: Omit<Cliente, "id" | "criado_em"> & {
+        Insert: Omit<Cliente, "id" | "criado_em" | "anonimizado_em"> & {
           id?: string;
           criado_em?: string;
+          anonimizado_em?: string | null;
         };
         Update: Partial<Omit<Cliente, "id" | "tenant_id" | "criado_em">>;
       };

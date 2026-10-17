@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 
 export function DashboardHighlight({ estoque }: { estoque: number }) {
   return (
@@ -6,12 +6,12 @@ export function DashboardHighlight({ estoque }: { estoque: number }) {
       <p className="text-sm text-white/80">Estoque à venda</p>
       <p className="mt-6 text-3xl font-semibold">{estoque}</p>
       <p className="text-sm text-white/80">veículos no pátio</p>
-      <Link
+      <PanelLink
         href="/veiculos/adicionar"
         className="mt-6 flex h-11 items-center justify-center rounded-xl bg-white text-sm font-semibold text-[#E10600]"
       >
         Adicionar veículo
-      </Link>
+      </PanelLink>
     </section>
   );
 }

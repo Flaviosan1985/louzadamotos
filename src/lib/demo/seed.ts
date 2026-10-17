@@ -176,6 +176,7 @@ export const demoClientes: Cliente[] = [
     email: "compras@nortesul.com",
     endereco: "Av. Industrial, 4500 — Guarulhos/SP",
     criado_em: "2026-09-03T15:20:00.000Z",
+    anonimizado_em: null,
   },
   {
     id: "c-3",
@@ -187,6 +188,7 @@ export const demoClientes: Cliente[] = [
     email: "pedro.costa@email.com",
     endereco: "Alameda Santos, 88 — São Paulo/SP",
     criado_em: "2026-10-04T09:10:00.000Z",
+    anonimizado_em: null,
   },
 ];
 

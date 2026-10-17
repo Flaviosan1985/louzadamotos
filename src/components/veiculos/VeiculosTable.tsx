@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,7 +60,7 @@ export function VeiculosTable({
               </TableCell>
               <TableCell className="text-right">{formatCurrency(veiculo.preco_venda)}</TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="sm" render={<Link href={`/veiculos/${veiculo.id}`} />}>
+                <Button variant="ghost" size="sm" nativeButton={false} render={<PanelLink href={`/veiculos/${veiculo.id}`} />}>
                   Editar
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => onDelete(veiculo.id)}>

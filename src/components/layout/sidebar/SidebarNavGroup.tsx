@@ -7,8 +7,6 @@
  */
 
 import { type ComponentType } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import * as Icon from "lucide-react";
 import { ChevronRightIcon } from "lucide-react";
 import type { MenuItem } from "@/configs/navConfig";
@@ -28,6 +26,8 @@ import {
 } from "@/components/ui/sidebar";
 import { SidebarFlyout } from "@/components/layout/sidebar/SidebarFlyout";
 import { SidebarMenuIndicator } from "@/components/layout/sidebar/SidebarMenuIndicator";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
+import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 
 const tabHover =
   "transition-colors duration-200 hover:bg-[#E10600]! hover:text-white! [&_svg]:hover:text-white!";
@@ -66,7 +66,7 @@ export function SidebarNavGroup({
   isBranchOpen: (key: string) => boolean;
   setOpenItem: (key: string, open: boolean) => void;
 }) {
-  const router = useRouter();
+  const { navigate } = usePanelNav();
 
   function isChildActive(item: MenuItem) {
     return (
@@ -117,7 +117,7 @@ export function SidebarNavGroup({
                     setOpenItem(item.label, open);
                     if (!open || childActive) return;
                     const href = firstLeafHref(item);
-                    if (href) router.push(href);
+                    if (href) navigate(href);
                   }}
                 >
                   <SidebarMenuItem>
@@ -181,7 +181,7 @@ export function SidebarNavGroup({
                                             isLinkActive(leaf.href, leaf.activePath, pathname, searchParams) &&
                                               "text-white!",
                                           )}
-                                          render={<Link href={leaf.href} />}
+                                          render={<PanelLink href={leaf.href} />}
                                           isActive={isLinkActive(
                                             leaf.href,
                                             leaf.activePath,
@@ -212,7 +212,7 @@ export function SidebarNavGroup({
                                   isLinkActive(subItem.href, subItem.activePath, pathname, searchParams) &&
                                     "text-white!",
                                 )}
-                                render={<Link href={subItem.href} />}
+                                render={<PanelLink href={subItem.href} />}
                                 isActive={isLinkActive(
                                   subItem.href,
                                   subItem.activePath,
@@ -239,7 +239,7 @@ export function SidebarNavGroup({
               >
                 <SidebarMenuButton
                   tooltip={item.label}
-                  render={<Link href={item.href} />}
+                  render={<PanelLink href={item.href} />}
                   isActive={pathname === item.href}
                   className={cn(activeLeafClass, pathname === item.href && "text-white!")}
                 >

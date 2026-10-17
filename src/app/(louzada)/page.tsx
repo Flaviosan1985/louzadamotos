@@ -1,14 +1,60 @@
-import { Suspense } from "react";
 import { HeroSection } from "@/components/louzada/HeroSection";
-import { DashboardStock } from "@/components/louzada/DashboardStock";
+import { StoreDepoimentos } from "@/components/louzada/StoreDepoimentos";
+import { StoreDiferenciais } from "@/components/louzada/StoreDiferenciais";
+import { StoreLocalizacao } from "@/components/louzada/StoreLocalizacao";
+import { StoreSobreSection } from "@/components/louzada/StoreSobreSection";
+import { VehicleCatalogSection } from "@/components/louzada/VehicleCatalogSection";
+import { parseFiltersFromSearchParams } from "@/lib/louzada/parse-filters";
+import { listBrands, listVehicles } from "@/lib/louzada/vehicles-repository";
 
-export default function LouzadaHomePage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function LouzadaHomePage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const filters = parseFiltersFromSearchParams(params);
+  const featured = listVehicles({ hideSold: true }).filter((v) => v.featured === 1);
+  const stock = listVehicles(filters);
+  const brands = listBrands();
+
   return (
     <>
       <HeroSection />
-      <Suspense fallback={<p className="px-4 py-10 text-sm text-zinc-500">Carregando estoque…</p>}>
-        <DashboardStock variant="home" basePath="/" title="Estoque" />
-      </Suspense>
+
+      <VehicleCatalogSection
+        id="destaques"
+        eyebrow="Seleção especial"
+        title={
+          <>
+            Destaques <span className="text-[#c41e3a]">da loja</span>
+          </>
+        }
+        description="Os veículos em evidência no momento — confira fotos e fale direto no WhatsApp."
+        vehicles={featured.slice(0, 6)}
+        brands={brands}
+        basePath="/"
+        showFilters={false}
+      />
+
+      <VehicleCatalogSection
+        id="estoque"
+        eyebrow="Estoque completo"
+        title={
+          <>
+            Motos & <span className="text-[#c41e3a]">Autos</span>
+          </>
+        }
+        description="Filtre por marca, preço ou busca. Veículos vendidos aparecem ao final da lista."
+        vehicles={stock}
+        brands={brands}
+        basePath="/"
+      />
+
+      <StoreDiferenciais />
+      <StoreSobreSection />
+      <StoreDepoimentos />
+      <StoreLocalizacao />
     </>
   );
 }

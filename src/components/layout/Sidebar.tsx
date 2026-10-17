@@ -8,11 +8,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { navItems } from "@/configs/navConfig";
 import { themeConfig } from "@/configs/themeConfig";
 import { emptySearchParams, getActiveBranchKeys } from "@/lib/nav";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
+import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 import {
   Sidebar as SidebarShell,
   SidebarContent,
@@ -27,7 +27,7 @@ import { SidebarAccount } from "@/components/layout/sidebar/SidebarAccount";
 import { SidebarNavGroup } from "@/components/layout/sidebar/SidebarNavGroup";
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const { pathname } = usePanelNav();
   const { state, isMobile } = useSidebar();
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
 
@@ -69,7 +69,7 @@ export function Sidebar() {
             <SidebarMenuButton
               size="lg"
               className="h-16 overflow-visible! bg-transparent! px-2 hover:bg-transparent!"
-              render={<Link href={themeConfig.homePageUrl} />}
+              render={<PanelLink href={themeConfig.homePageUrl} />}
             >
               <Image
                 src="/logo.jpg"

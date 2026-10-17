@@ -1,12 +1,23 @@
 "use client";
 
-import { useCallback } from "react";
-import { loadAppSnapshot, type AppSnapshot } from "@/lib/data/app-data";
-import { useQuery } from "@/hooks/use-query";
+import { createContext, useContext } from "react";
+import type { AppSnapshot } from "@/lib/data/app-data";
 
 export type { AppSnapshot };
 
+export type AppSnapshotState = {
+  data: AppSnapshot | null;
+  error: Error | null;
+  loading: boolean;
+  refetch: () => Promise<AppSnapshot | null>;
+};
+
+export const AppSnapshotContext = createContext<AppSnapshotState | null>(null);
+
 export function useAppSnapshot() {
-  const fetcher = useCallback(() => loadAppSnapshot(), []);
-  return useQuery<AppSnapshot>("app-snapshot", fetcher);
+  const context = useContext(AppSnapshotContext);
+  if (!context) {
+    throw new Error("useAppSnapshot precisa do AppSnapshotProvider");
+  }
+  return context;
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, CircleHelp, Info, LogOut, User } from "lucide-react";
 import { toast } from "sonner";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,19 +65,19 @@ export function AccountMenu() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<Link href="/conta" />}>
+          <DropdownMenuItem render={<PanelLink href="/conta" />}>
             <User />
             <span>Conta</span>
           </DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/sistema/sobre" />}>
+          <DropdownMenuItem render={<PanelLink href="/sistema/sobre" />}>
             <Info />
             <span>Sobre</span>
           </DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/suporte" />}>
+          <DropdownMenuItem render={<PanelLink href="/suporte" />}>
             <CircleHelp />
             <span>Suporte</span>
           </DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/configuracoes/tutorial" />}>
+          <DropdownMenuItem render={<PanelLink href="/configuracoes/tutorial" />}>
             <BookOpen />
             <span>Tutorial</span>
           </DropdownMenuItem>

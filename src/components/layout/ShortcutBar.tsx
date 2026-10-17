@@ -1,14 +1,14 @@
 "use client";
 
 import { type ComponentType } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
+import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 import * as Icon from "lucide-react";
 import { shortcutItems } from "@/configs/navConfig";
 import { cn } from "@/lib/utils";
 
 export function ShortcutBar() {
-  const pathname = usePathname();
+  const { pathname } = usePanelNav();
 
   return (
     <nav
@@ -20,7 +20,7 @@ export function ShortcutBar() {
         const active = item.href === "/" ? pathname === "/" : pathname === item.href;
 
         return (
-          <Link
+          <PanelLink
             key={item.label}
             href={item.href}
             title={item.label}
@@ -31,7 +31,7 @@ export function ShortcutBar() {
           >
             {Tag ? <Tag className="size-5" /> : null}
             <span className="sr-only">{item.label}</span>
-          </Link>
+          </PanelLink>
         );
       })}
     </nav>

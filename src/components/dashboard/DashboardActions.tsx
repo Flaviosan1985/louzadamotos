@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { Calendar, MessageCircle, Phone } from "lucide-react";
 
 export function DashboardActions({ telefone }: { telefone: string | null }) {
@@ -17,13 +17,13 @@ export function DashboardActions({ telefone }: { telefone: string | null }) {
           const Icon = action.icon;
           return (
             <li key={action.label}>
-              <Link
+              <PanelLink
                 href={action.href}
                 className="hover:bg-[#F5F4F8] flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition"
               >
                 <Icon className="text-muted-foreground size-4" />
                 {action.label}
-              </Link>
+              </PanelLink>
             </li>
           );
         })}

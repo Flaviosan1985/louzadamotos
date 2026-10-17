@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
+import { PanelLink } from "@/components/layout/panel/PanelLink";
 
 function initialsFrom(nome: string) {
   return nome
@@ -18,7 +18,7 @@ export function SidebarAccount() {
   const loja = data?.tenant.nome ?? "Louzada Motos";
 
   return (
-    <Link
+    <PanelLink
       href="/conta"
       className="hover:bg-[#F5F4F8] flex items-center gap-3 rounded-xl px-2 py-2 transition"
     >
@@ -29,6 +29,6 @@ export function SidebarAccount() {
         <span className="block truncate text-sm font-medium">{nome}</span>
         <span className="text-muted-foreground block truncate text-xs">{loja}</span>
       </span>
-    </Link>
+    </PanelLink>
   );
 }
