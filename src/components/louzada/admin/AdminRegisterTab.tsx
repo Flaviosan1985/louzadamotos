@@ -9,14 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 export function AdminRegisterTab() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setMessage("");
     const form = new FormData(e.currentTarget);
+    const type = String(form.get("type"));
     const body = {
-      type: String(form.get("type")),
+      type,
       brand: String(form.get("brand")),
       model: String(form.get("model")),
       year: Number(form.get("year")),
@@ -25,18 +27,39 @@ export function AdminRegisterTab() {
       price: Number(form.get("price")),
       description: String(form.get("description")),
       featured: form.get("featured") === "on",
+      displacement:
+        type === "moto" && form.get("displacement")
+          ? Number(form.get("displacement"))
+          : null,
     };
     const res = await fetch("/api/vehicles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    setLoading(false);
     if (!res.ok) {
+      setLoading(false);
       setMessage("Erro ao cadastrar.");
       return;
     }
-    setMessage("Veículo cadastrado! Envie fotos na aba Fotos.");
+    const vehicle = (await res.json()) as { id: number };
+
+    if (photoFile) {
+      const upload = new FormData();
+      upload.append("files", photoFile);
+      await fetch(`/api/vehicles/${vehicle.id}/photos`, {
+        method: "POST",
+        body: upload,
+      });
+    }
+
+    setLoading(false);
+    setMessage(
+      photoFile
+        ? "Moto cadastrada com foto! Você pode adicionar mais imagens na aba Fotos."
+        : "Moto cadastrada! Envie fotos na aba Fotos.",
+    );
+    setPhotoFile(null);
     e.currentTarget.reset();
   }
 
@@ -44,7 +67,7 @@ export function AdminRegisterTab() {
     <form onSubmit={onSubmit} className="grid max-w-xl gap-4">
       <div className="grid gap-2">
         <Label htmlFor="type">Tipo</Label>
-        <select id="type" name="type" className="h-9 rounded-md border px-3 text-sm" required>
+        <select id="type" name="type" className="h-9 rounded-md border px-3 text-sm" defaultValue="moto" required>
           <option value="moto">Moto</option>
           <option value="auto">Auto</option>
         </select>
@@ -65,8 +88,18 @@ export function AdminRegisterTab() {
           <Input id="year" name="year" type="number" required />
         </div>
         <div className="grid gap-2">
+          <Label htmlFor="displacement">Cilindrada (cc)</Label>
+          <Input id="displacement" name="displacement" type="number" placeholder="ex.: 500" />
+        </div>
+        <div className="grid gap-2">
           <Label htmlFor="km">Km</Label>
           <Input id="km" name="km" type="number" defaultValue={0} />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor="color">Cor</Label>
+          <Input id="color" name="color" />
         </div>
         <div className="grid gap-2">
           <Label htmlFor="price">Preço</Label>
@@ -74,12 +107,18 @@ export function AdminRegisterTab() {
         </div>
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="color">Cor</Label>
-        <Input id="color" name="color" />
-      </div>
-      <div className="grid gap-2">
         <Label htmlFor="description">Descrição</Label>
         <Textarea id="description" name="description" rows={4} />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="photo">Foto principal</Label>
+        <Input
+          id="photo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+        />
+        <p className="text-xs text-zinc-500">Opcional — JPG, PNG ou WebP.</p>
       </div>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="featured" className="size-4 accent-[#E10600]" />
@@ -87,7 +126,7 @@ export function AdminRegisterTab() {
       </label>
       {message ? <p className="text-sm text-zinc-600">{message}</p> : null}
       <Button type="submit" disabled={loading} className="w-fit bg-[#E10600] hover:bg-[#C00500] text-white">
-        {loading ? "Salvando…" : "Cadastrar veículo"}
+        {loading ? "Salvando…" : "Cadastrar moto"}
       </Button>
     </form>
   );

@@ -1,7 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { navItems } from "../../configs/navConfig.ts";
+import { navItems, shortcutItems } from "../../configs/navConfig.ts";
 import {
+  escritaDoCatalogo,
+  filtrarAtalhos,
   filtrarNav,
   pode,
   rotaPermitida,
@@ -59,6 +61,8 @@ test("rotas de usuários e financeiro respeitam o papel", () => {
   assert.equal(rotaPermitida("/configuracoes/contratos", "vendedor"), false);
   assert.equal(rotaPermitida("/configuracoes/contratos", "admin"), true);
   assert.equal(rotaPermitida("/cadastros/clientes", "vendedor"), true);
+  assert.equal(rotaPermitida("/veiculos/adicionar", "financeiro"), false);
+  assert.equal(rotaPermitida("/veiculos/adicionar", "vendedor"), true);
   assert.equal(rotaPermitida("/relatorios/acoes", "vendedor"), false);
   assert.equal(rotaPermitida("/relatorios/acoes", "admin"), true);
 });
@@ -77,4 +81,20 @@ test("toda ação conhecida tem resposta boolean", () => {
   for (const acao of ACOES) {
     assert.equal(typeof pode("admin", acao), "boolean");
   }
+});
+
+test("atalhos do vendedor não apontam para o caixa nem para configuração", () => {
+  const hrefs = filtrarAtalhos(shortcutItems, "vendedor").map((item) => item.href);
+  assert.equal(hrefs.includes("/financeiro/painel"), false);
+  assert.equal(hrefs.includes("/configuracoes/impressos"), false);
+  assert.equal(hrefs.includes("/atalhos/kanban"), true);
+  assert.equal(hrefs.includes("/configuracoes/tutorial"), true);
+});
+
+test("escrita do catálogo segue o papel", () => {
+  assert.equal(escritaDoCatalogo("usuarios", "vendedor"), false);
+  assert.equal(escritaDoCatalogo("usuarios", "admin"), true);
+  assert.equal(escritaDoCatalogo("impressos", "vendedor"), false);
+  assert.equal(escritaDoCatalogo("leads", "vendedor"), true);
+  assert.equal(escritaDoCatalogo("leads", "financeiro"), false);
 });

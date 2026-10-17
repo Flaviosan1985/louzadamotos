@@ -17,6 +17,7 @@ function mapVehicle(row: Vehicle): Vehicle {
     price: Number(row.price),
     year: Number(row.year),
     km: Number(row.km),
+    displacement: row.displacement != null ? Number(row.displacement) : null,
   };
 }
 
@@ -119,18 +120,20 @@ export type CreateVehicleInput = {
   price: number;
   description: string;
   featured?: boolean;
+  displacement?: number | null;
 };
 
 export function createVehicle(input: CreateVehicleInput) {
   const database = getDb();
   const result = database
     .prepare(
-      `INSERT INTO vehicles (type, brand, model, year, km, color, price, description, featured)
-       VALUES (@type, @brand, @model, @year, @km, @color, @price, @description, @featured)`,
+      `INSERT INTO vehicles (type, brand, model, year, km, color, price, description, featured, displacement)
+       VALUES (@type, @brand, @model, @year, @km, @color, @price, @description, @featured, @displacement)`,
     )
     .run({
       ...input,
       featured: input.featured ? 1 : 0,
+      displacement: input.displacement ?? null,
     });
   return getVehicleById(Number(result.lastInsertRowid));
 }
@@ -155,6 +158,8 @@ export function updateVehicle(id: number, input: UpdateVehicleInput) {
     description: input.description ?? current.description,
     status: input.status ?? current.status,
     featured: input.featured != null ? (input.featured ? 1 : 0) : current.featured,
+    displacement:
+      input.displacement !== undefined ? input.displacement : current.displacement,
   };
 
   database
@@ -162,7 +167,7 @@ export function updateVehicle(id: number, input: UpdateVehicleInput) {
       `UPDATE vehicles SET
         type = @type, brand = @brand, model = @model, year = @year, km = @km,
         color = @color, price = @price, description = @description,
-        status = @status, featured = @featured
+        status = @status, featured = @featured, displacement = @displacement
        WHERE id = @id`,
     )
     .run({ ...next, id });

@@ -1,0 +1,21 @@
+{
+  "name": "louzada-api",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 execute louzada-db --local --file=./schema/0001_auth.sql && wrangler d1 execute louzada-db --local --file=./schema/0002_louzada.sql",
+    "db:migrate:remote": "wrangler d1 execute louzada-db --remote --file=./schema/0001_auth.sql && wrangler d1 execute louzada-db --remote --file=./schema/0002_louzada.sql",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "jose": "^6.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261006.1",
+    "typescript": "^5.8.2",
+    "wrangler": "^4.14.0"
+  }
+}

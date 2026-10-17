@@ -10,11 +10,13 @@ export function KanbanColumn({
   cards,
   onMove,
   onDelete,
+  somenteLeitura = false,
 }: {
   etapa: Etapa;
   cards: ModuleRow[];
   onMove: (row: ModuleRow, destino: Etapa) => void;
   onDelete: (id: string) => void;
+  somenteLeitura?: boolean;
 }) {
   const anterior = etapa === "Vendido" ? null : etapaVizinha(etapa, -1);
   const proxima = etapaVizinha(etapa, 1);
@@ -47,6 +49,7 @@ export function KanbanColumn({
               {etapa === "Perdido" && card.motivo_perda ? (
                 <p className="text-destructive text-xs">{card.motivo_perda}</p>
               ) : null}
+              {somenteLeitura ? null : (
               <div className="flex flex-wrap gap-1">
                 {anterior ? (
                   <Button type="button" size="sm" variant="ghost" onClick={() => onMove(card, anterior)}>
@@ -72,6 +75,7 @@ export function KanbanColumn({
                   Excluir
                 </Button>
               </div>
+              )}
             </article>
           ))
         )}

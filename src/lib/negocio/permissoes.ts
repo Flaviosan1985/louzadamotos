@@ -1,5 +1,12 @@
 import type { PapelUsuario } from "../types/database.ts";
-import type { MenuGroupSubItem, MenuItem, MenuSubItem, NavItem } from "../../configs/navConfig.ts";
+import type { ExtraKey } from "../types/modulos.ts";
+import type {
+  MenuGroupSubItem,
+  MenuItem,
+  MenuSubItem,
+  NavItem,
+  ShortcutItem,
+} from "../../configs/navConfig.ts";
 
 const isSubGroup = (item: MenuSubItem): item is MenuGroupSubItem => "childItems" in item;
 
@@ -50,6 +57,7 @@ export function pode(papel: PapelUsuario, acao: Acao) {
 
 const PREFIXOS: { prefixo: string; papeis: PapelUsuario[] }[] = [
   { prefixo: "/cadastros/usuarios", papeis: ["admin"] },
+  { prefixo: "/veiculos/adicionar", papeis: ["admin", "vendedor"] },
   { prefixo: "/financeiro", papeis: ["admin", "financeiro"] },
   { prefixo: "/relatorios/acoes", papeis: ["admin"] },
   { prefixo: "/relatorios/financas", papeis: ["admin", "financeiro"] },
@@ -86,7 +94,13 @@ function filtrarItem(item: MenuItem, papel: PapelUsuario): MenuItem | null {
     .map((sub) => filtrarSub(sub, papel))
     .filter((sub): sub is MenuSubItem => Boolean(sub));
   if (!childItems.length) return null;
-  return { ...item, childItems };
+  return {
+    icon: item.icon,
+    label: item.label,
+    badge: item.badge,
+    badgeClassName: item.badgeClassName,
+    childItems,
+  };
 }
 
 export function filtrarNav(groups: NavItem[], papel: PapelUsuario): NavItem[] {
@@ -96,4 +110,25 @@ export function filtrarNav(groups: NavItem[], papel: PapelUsuario): NavItem[] {
       items: group.items.map((item) => filtrarItem(item, papel)).filter((item): item is MenuItem => Boolean(item)),
     }))
     .filter((group) => group.items.length > 0);
+}
+
+export function filtrarAtalhos(items: ShortcutItem[], papel: PapelUsuario) {
+  return items.filter((item) => rotaPermitida(item.href, papel));
+}
+
+const CATALOGO_USUARIOS: ExtraKey[] = ["usuarios"];
+const CATALOGO_CONFIG: ExtraKey[] = [
+  "impressos",
+  "procedimentos",
+  "mensagens",
+  "linkSite",
+  "comissoes",
+  "modulos",
+  "apiKeys",
+];
+
+export function escritaDoCatalogo(extraKey: ExtraKey, papel: PapelUsuario) {
+  if (CATALOGO_USUARIOS.includes(extraKey)) return pode(papel, "usuarios.gerenciar");
+  if (CATALOGO_CONFIG.includes(extraKey)) return pode(papel, "configuracoes.editar");
+  return pode(papel, "comercial.escrever");
 }

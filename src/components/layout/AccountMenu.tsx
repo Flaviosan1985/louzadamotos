@@ -7,6 +7,7 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/client";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { PanelLink } from "@/components/layout/panel/PanelLink";
+import { DemoPapelSwitch } from "@/components/layout/DemoPapelSwitch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,7 @@ export function AccountMenu() {
   const router = useRouter();
   const { data } = useAppSnapshot();
   const nome = data?.profile.nome ?? "Conta";
+  const papel = data?.profile.papel ?? "";
   const iniciais = data ? initialsFrom(data.profile.nome) : "AD";
 
   async function handleLogout() {
@@ -61,8 +63,12 @@ export function AccountMenu() {
         <DropdownMenuGroup>
           <DropdownMenuLabel className="font-normal">
             <span className="text-foreground text-sm font-semibold">{nome}</span>
+            {papel ? (
+              <span className="text-muted-foreground mt-0.5 block text-xs capitalize">{papel}</span>
+            ) : null}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
+        <DemoPapelSwitch />
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem render={<PanelLink href="/conta" />}>

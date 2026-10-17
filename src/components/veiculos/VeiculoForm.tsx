@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 import { toast } from "sonner";
 import { loadAppSnapshot, saveVeiculo, uploadPublicFile } from "@/lib/data/app-data";
+import { pode } from "@/lib/negocio/permissoes";
+import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { STATUS_VEICULO, TIPOS_VEICULO } from "@/lib/constants";
 import type { StatusVeiculo, TipoVeiculo, Veiculo } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormField } from "@/components/shared/FormField";
+import { VeiculoFotosField } from "@/components/veiculos/VeiculoFotosField";
 import {
   validateVeiculo,
   type VeiculoFormErrors,
@@ -20,6 +23,10 @@ const currentYear = new Date().getFullYear();
 
 export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
   const { navigate } = usePanelNav();
+  const snapshot = useAppSnapshot();
+  const podeEscrever = snapshot.data
+    ? pode(snapshot.data.profile.papel, "comercial.escrever")
+    : true;
   const [loading, setLoading] = useState(Boolean(veiculoId));
   const [saving, setSaving] = useState(false);
   const [tenantId, setTenantId] = useState("");
@@ -28,7 +35,7 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
   const [vendidoEm, setVendidoEm] = useState<string | null>(null);
   const [errors, setErrors] = useState<VeiculoFormErrors>({});
   const [form, setForm] = useState({
-    tipo: "carro" as TipoVeiculo,
+    tipo: "moto" as TipoVeiculo,
     marca: "",
     modelo: "",
     ano_fabricacao: currentYear,
@@ -37,6 +44,7 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
     renavam: "",
     km: 0,
     cor: "",
+    cilindrada: "",
     preco_custo: 0,
     preco_venda: 0,
     status: "disponivel" as StatusVeiculo,
@@ -66,6 +74,7 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
           renavam: found.renavam ?? "",
           km: found.km,
           cor: found.cor ?? "",
+          cilindrada: found.cilindrada ? String(found.cilindrada) : "",
           preco_custo: found.preco_custo,
           preco_venda: found.preco_venda,
           status: found.status,
@@ -89,10 +98,18 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
   }
 
   async function onUpload(files: FileList | null) {
-    if (!files?.length) return;
+    if (!files?.length || !podeEscrever) return;
     try {
+      const selected = Array.from(files).filter((file) => {
+        if (file.size > 2 * 1024 * 1024) {
+          toast.error(`${file.name} passa de 2 MB.`);
+          return false;
+        }
+        return true;
+      });
+      if (!selected.length) return;
       const urls = await Promise.all(
-        Array.from(files).map((file) =>
+        selected.map((file) =>
           uploadPublicFile({
             bucket: "veiculos",
             tenantId,
@@ -102,8 +119,8 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
           }),
         ),
       );
-      setFotos((current) => [...current, ...urls]);
-      toast.success("Foto enviada.");
+      setFotos((current) => [...current, ...urls].slice(0, 8));
+      toast.success(urls.length > 1 ? "Fotos enviadas." : "Foto enviada.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha no upload.");
     }
@@ -115,6 +132,11 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    if (!podeEscrever) {
+      toast.error("Este perfil não altera veículos.");
+      return;
+    }
+
     setSaving(true);
     try {
       const payload = {
@@ -123,12 +145,20 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
         placa: form.placa || null,
         renavam: form.renavam || null,
         cor: form.cor || null,
+        cilindrada: form.cilindrada ? Number(form.cilindrada) : null,
         observacoes: form.observacoes || null,
         fotos,
         vendido_em: form.status === "vendido" ? (vendidoEm ?? new Date().toISOString()) : null,
       };
       const saved = await saveVeiculo(payload, demo);
-      toast.success(veiculoId ? "Veículo atualizado." : "Veículo cadastrado.");
+      await snapshot.refetch();
+      toast.success(
+        veiculoId
+          ? "Veículo atualizado."
+          : saved.status === "disponivel"
+            ? "Veículo cadastrado e publicado na vitrine."
+            : "Veículo cadastrado.",
+      );
       navigate(saved.status === "vendido" ? "/veiculos/vendidos" : "/veiculos/a-venda");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível salvar.");
@@ -215,6 +245,17 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
         <FormField label="Cor">
           <Input value={form.cor} onChange={(event) => update("cor", event.target.value)} />
         </FormField>
+        {form.tipo === "moto" ? (
+          <FormField label="Cilindrada (cc)">
+            <Input
+              type="number"
+              min={0}
+              placeholder="Ex.: 500"
+              value={form.cilindrada}
+              onChange={(event) => update("cilindrada", event.target.value)}
+            />
+          </FormField>
+        ) : null}
         <FormField label="Preço de custo" error={errors.preco_custo}>
           <Input
             type="number"
@@ -234,25 +275,29 @@ export function VeiculoForm({ veiculoId }: { veiculoId?: string }) {
           />
         </FormField>
       </div>
-      <FormField label="Observações">
-        <Textarea value={form.observacoes} onChange={(event) => update("observacoes", event.target.value)} />
+      <FormField label="Descrição para o site">
+        <Textarea
+          rows={4}
+          placeholder="Revisão, pneus, acessórios, histórico…"
+          value={form.observacoes}
+          onChange={(event) => update("observacoes", event.target.value)}
+        />
       </FormField>
-      <FormField label="Fotos">
-        <Input type="file" accept="image/*" multiple onChange={(event) => onUpload(event.target.files)} />
-        {fotos.length ? (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {fotos.map((foto) => (
-              <img key={foto} src={foto} alt="" className="size-20 rounded-md object-cover" />
-            ))}
-          </div>
-        ) : null}
-      </FormField>
+      <VeiculoFotosField
+        fotos={fotos}
+        disabled={!tenantId}
+        onAdd={onUpload}
+        onRemove={(src) => setFotos((current) => current.filter((item) => item !== src))}
+      />
+      <p className="text-muted-foreground text-xs">
+        Com status Disponível, este cadastro entra na vitrine do site na hora.
+      </p>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={() => window.history.back()}>
           Cancelar
         </Button>
-        <Button type="submit" disabled={saving}>
-          {saving ? "Salvando..." : "Salvar veículo"}
+        <Button type="submit" disabled={saving || !podeEscrever}>
+          {saving ? "Salvando..." : podeEscrever ? "Salvar veículo" : "Somente leitura"}
         </Button>
       </div>
     </form>

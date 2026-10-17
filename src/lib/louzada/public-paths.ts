@@ -5,6 +5,7 @@ const EXACT = new Set([
   "/sobre",
   "/contato",
   "/admin/login",
+  "/painel/login",
 ]);
 
 const PREFIXES = ["/veiculo/", "/api/uploads/"];
@@ -19,13 +20,18 @@ export function isLouzadaPublicPath(pathname: string) {
 }
 
 export function isLouzadaAdminPath(pathname: string) {
+  if (pathname.startsWith("/painel") && !pathname.startsWith("/painel/login")) {
+    return true;
+  }
   return pathname.startsWith("/admin") && !pathname.startsWith("/admin/login");
 }
 
 export function isLouzadaWriteApi(pathname: string, method: string) {
   if (method === "GET" || method === "HEAD" || method === "OPTIONS") return false;
   if (pathname === "/api/auth/login" || pathname === "/api/auth/logout") return false;
+  if (pathname === "/api/leads" && method === "POST") return false;
   if (pathname.startsWith("/api/vehicles")) return true;
   if (pathname.startsWith("/api/photos")) return true;
+  if (pathname.startsWith("/api/leads")) return true;
   return false;
 }

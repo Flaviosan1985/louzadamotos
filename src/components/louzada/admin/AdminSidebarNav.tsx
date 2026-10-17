@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { Bike, Camera, CheckCircle, PlusCircle, type LucideIcon } from "lucide-react";
+import { Bike, Camera, CheckCircle, PlusCircle, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LOUZADA_RED } from "@/lib/louzada/admin-theme";
 import type { AdminTabId } from "@/components/louzada/admin/types";
@@ -18,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "register", label: "Cadastrar", icon: PlusCircle, group: "Estoque" },
   { id: "photos", label: "Fotos", icon: Camera, group: "Gestão" },
   { id: "sold", label: "Vendidos", icon: CheckCircle, group: "Gestão" },
+  { id: "leads", label: "Interessados", icon: Users, group: "Gestão" },
 ];
 
 type AdminSidebarNavProps = {

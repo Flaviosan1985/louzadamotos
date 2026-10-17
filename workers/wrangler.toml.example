@@ -1,0 +1,22 @@
+name = "louzada-api"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "louzada-db"
+database_id = "COLE_O_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "PHOTOS_BUCKET"
+bucket_name = "louzada-fotos-privadas"
+
+[vars]
+R2_ACCOUNT_ID = "COLE_ACCOUNT_ID"
+R2_BUCKET_NAME = "louzada-fotos-privadas"
+JWT_ISSUER = "louzada-api"
+
+# Secrets (wrangler secret put):
+# JWT_SECRET
+# R2_ACCESS_KEY_ID
+# R2_SECRET_ACCESS_KEY

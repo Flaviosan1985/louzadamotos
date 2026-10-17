@@ -25,6 +25,11 @@
 /uploads/*
 !/uploads/.gitkeep
 
+# Python (CrewAI / scripts)
+.venv-crewai/
+scripts/__pycache__/
+*.py[cod]
+
 # misc
 .DS_Store
 *.pem

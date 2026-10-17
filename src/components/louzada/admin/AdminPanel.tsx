@@ -10,6 +10,7 @@ import { AdminRegisterTab } from "@/components/louzada/admin/AdminRegisterTab";
 import { AdminShell } from "@/components/louzada/admin/AdminShell";
 import { AdminSidebar } from "@/components/louzada/admin/AdminSidebar";
 import { AdminSoldTab } from "@/components/louzada/admin/AdminSoldTab";
+import { AdminLeadsTab } from "@/components/louzada/admin/AdminLeadsTab";
 import { AdminVehiclesTab } from "@/components/louzada/admin/AdminVehiclesTab";
 import type { AdminTabId } from "@/components/louzada/admin/types";
 import { adminCardClass } from "@/lib/louzada/admin-theme";
@@ -24,6 +25,8 @@ function AdminTabPanel({ active }: { active: AdminTabId }) {
       return <AdminPhotosTab />;
     case "sold":
       return <AdminSoldTab />;
+    case "leads":
+      return <AdminLeadsTab />;
     default:
       return null;
   }
@@ -35,7 +38,7 @@ export function AdminPanel() {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/admin/login");
+    router.push("/painel/login");
     router.refresh();
   }
 

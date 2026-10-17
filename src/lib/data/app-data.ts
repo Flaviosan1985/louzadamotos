@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import {
-  demoDeleteCliente,
   demoDeleteExtra,
   demoDeleteFinanceiro,
   demoDeleteVeiculo,
@@ -16,6 +15,7 @@ import {
   demoUpsertVeiculo,
   readDemoState,
 } from "@/lib/demo/store";
+import { recusarExclusao } from "@/lib/negocio/privacidade";
 import type { DemoExtras, ExtraKey, ModuleRow } from "@/lib/types/modulos";
 import type {
   Cliente,
@@ -53,12 +53,26 @@ function mapVeiculo(row: Veiculo): Veiculo {
     preco_custo: Number(row.preco_custo),
     preco_venda: Number(row.preco_venda),
     km: Number(row.km),
+    cilindrada: row.cilindrada == null ? null : Number(row.cilindrada),
     fotos: row.fotos ?? [],
   };
 }
 
 function mapFinanceiro(row: LancamentoFinanceiro): LancamentoFinanceiro {
   return { ...row, valor: Number(row.valor) };
+}
+
+async function syncVitrineFromClient(veiculos: Veiculo[]) {
+  if (typeof window === "undefined") return;
+  try {
+    await fetch("/api/vitrine/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ veiculos }),
+    });
+  } catch {
+    // vitrine opcional em ambientes sem filesystem
+  }
 }
 
 export async function loadAppSnapshot(): Promise<AppSnapshot> {
@@ -177,6 +191,7 @@ export async function saveVeiculo(
 ) {
   if (demo) return demoUpsertVeiculo(payload);
   const supabase = createClient();
+  let saved: Veiculo;
   if ("id" in payload && payload.id) {
     const { id, ...patch } = payload;
     const { data, error } = await supabase
@@ -186,22 +201,31 @@ export async function saveVeiculo(
       .select("*")
       .single();
     if (error) throw new Error(error.message);
-    return mapVeiculo(data as Veiculo);
+    saved = mapVeiculo(data as Veiculo);
+  } else {
+    const { data, error } = await supabase
+      .from("veiculos")
+      .insert(payload as VeiculoInsert)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    saved = mapVeiculo(data as Veiculo);
   }
-  const { data, error } = await supabase
-    .from("veiculos")
-    .insert(payload as VeiculoInsert)
-    .select("*")
-    .single();
-  if (error) throw new Error(error.message);
-  return mapVeiculo(data as Veiculo);
+  const snap = await loadAppSnapshot();
+  await syncVitrineFromClient(snap.veiculos);
+  return saved;
 }
 
 export async function removeVeiculo(id: string, demo: boolean) {
-  if (demo) return demoDeleteVeiculo(id);
+  if (demo) {
+    demoDeleteVeiculo(id);
+    return;
+  }
   const supabase = createClient();
   const { error } = await supabase.from("veiculos").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  const snap = await loadAppSnapshot();
+  await syncVitrineFromClient(snap.veiculos);
 }
 
 export async function saveCliente(
@@ -230,11 +254,8 @@ export async function saveCliente(
   return data as Cliente;
 }
 
-export async function removeCliente(id: string, demo: boolean) {
-  if (demo) return demoDeleteCliente(id);
-  const supabase = createClient();
-  const { error } = await supabase.from("clientes").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+export async function removeCliente(_id: string, _demo: boolean) {
+  throw new Error(recusarExclusao());
 }
 
 export async function saveFinanceiro(

@@ -16,7 +16,7 @@ async function handleLouzada(request: NextRequest) {
   if (isLouzadaPublicPath(pathname) && !isLouzadaWriteApi(pathname, method)) {
     if (isLouzadaAdminPath(pathname) && !authed) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
+      url.pathname = pathname.startsWith("/painel") ? "/painel/login" : "/admin/login";
       url.searchParams.set("next", pathname);
       return NextResponse.redirect(url);
     }
@@ -29,7 +29,7 @@ async function handleLouzada(request: NextRequest) {
         return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
       }
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
+      url.pathname = pathname.startsWith("/painel") ? "/painel/login" : "/admin/login";
       url.searchParams.set("next", pathname);
       return NextResponse.redirect(url);
     }
@@ -48,6 +48,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (pathname === "/api/leads" && request.method === "POST") {
+    return NextResponse.next({ request });
+  }
+
   const louzada = await handleLouzada(request);
   if (louzada) return louzada;
 
@@ -56,6 +60,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm)$).*)",
   ],
 };

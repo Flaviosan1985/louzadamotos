@@ -18,7 +18,7 @@ export function AdminSoldTab() {
     void load();
   }, [load]);
 
-  async function reactivate(id: number) {
+  async function reactivate(id: number | string) {
     await fetch(`/api/vehicles/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

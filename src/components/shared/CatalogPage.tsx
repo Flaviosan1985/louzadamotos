@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { removeModuleRow, restoreExcluido, saveModuleRow } from "@/lib/data/app-data";
+import { escritaDoCatalogo } from "@/lib/negocio/permissoes";
 import { filterRows } from "@/lib/modulos/filter-rows";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -62,6 +63,7 @@ export function CatalogPage({
   const [editing, setEditing] = useState<ModuleRow | null | "new">(null);
   const debouncedBusca = useDebounce(busca, 300);
 
+  const podeEscrever = data ? escritaDoCatalogo(extraKey, data.profile.papel) : false;
   const items = data?.extras[extraKey] ?? [];
   const filtered = useMemo(() => filterRows(items, debouncedBusca), [items, debouncedBusca]);
   const formFields = useMemo(
@@ -136,7 +138,9 @@ export function CatalogPage({
             title={title}
             count={`${filtered.length} ${countLabel}`}
             action={
-              newLabel ? <Button onClick={() => setEditing("new")}>{newLabel}</Button> : undefined
+              newLabel && podeEscrever ? (
+                <Button onClick={() => setEditing("new")}>{newLabel}</Button>
+              ) : undefined
             }
           />
           <p className="text-muted-foreground -mt-3 text-sm">{description}</p>
@@ -159,7 +163,9 @@ export function CatalogPage({
               title="Nenhum registro neste filtro"
               description="Cadastre o primeiro item ou limpe a busca."
               action={
-                newLabel ? <Button onClick={() => setEditing("new")}>{newLabel}</Button> : undefined
+                newLabel && podeEscrever ? (
+                  <Button onClick={() => setEditing("new")}>{newLabel}</Button>
+                ) : undefined
               }
             />
           </QueryState.Empty>
@@ -167,8 +173,8 @@ export function CatalogPage({
             <EntityTable
               columns={columns}
               rows={filtered}
-              onEdit={newLabel ? setEditing : undefined}
-              onDelete={restore ? undefined : handleDelete}
+              onEdit={newLabel && podeEscrever ? setEditing : undefined}
+              onDelete={restore || !podeEscrever ? undefined : handleDelete}
               extraAction={
                 restore
                   ? (row) => (

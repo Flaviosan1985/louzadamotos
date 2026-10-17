@@ -14,11 +14,9 @@ import type { Cliente } from "@/lib/types/database";
 export function ClientesTable({
   clientes,
   onEdit,
-  onDelete,
 }: {
   clientes: Cliente[];
-  onEdit: (cliente: Cliente) => void;
-  onDelete: (id: string) => void;
+  onEdit?: (cliente: Cliente) => void;
 }) {
   return (
     <div className="bg-card rounded-xl border">
@@ -54,12 +52,11 @@ export function ClientesTable({
                   <Printer aria-hidden />
                   Ficha
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => onEdit(cliente)}>
-                  Editar
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDelete(cliente.id)}>
-                  Excluir
-                </Button>
+                {onEdit ? (
+                  <Button variant="ghost" size="sm" onClick={() => onEdit(cliente)}>
+                    Editar
+                  </Button>
+                ) : null}
               </TableCell>
             </TableRow>
           ))}

@@ -109,8 +109,24 @@ export function seedExtras(): DemoExtras {
       row("cr-2", { cliente: "Pedro Henrique Costa", banco: "Santander", valor: "32000,00", status: "em analise" }),
     ],
     leads: [
-      row("ld-1", { nome: "Juliana Prado", telefone: "(11) 95555-1010", interesse: "Honda CB 500F", status: "novo", origem: "Instagram" }),
-      row("ld-2", { nome: "Ricardo Melo", telefone: "(11) 95555-2020", interesse: "T-Cross Comfortline", status: "atendimento", origem: "Site" }),
+      row("ld-1", {
+        nome: "Juliana Prado",
+        telefone: "(11) 95555-1010",
+        interesse: "Honda CB 500F",
+        veiculo_site_id: "v-1",
+        proposta: "Entrada de R$ 8.000 e o restante no cartão.",
+        status: "novo",
+        origem: "site",
+      }),
+      row("ld-2", {
+        nome: "Ricardo Melo",
+        telefone: "(11) 95555-2020",
+        interesse: "T-Cross Comfortline",
+        veiculo_site_id: "v-3",
+        proposta: "Gostaria de avaliar troca do meu carro.",
+        status: "atendimento",
+        origem: "site",
+      }),
     ],
     procurados: [
       row("pv-1", { marca: "Toyota", modelo: "Corolla", ano: "2022+", cliente: "Mariana Alves", telefone: "(11) 97777-0101" }),

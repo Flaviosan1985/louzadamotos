@@ -1,35 +1,28 @@
-import { BadgeCheck, Clock, Handshake, Shield, Sparkles, Wallet } from "lucide-react";
 import { buildWhatsAppUrl, storeContactMessage } from "@/lib/louzada/whatsapp";
 import { SectionHeading } from "@/components/louzada/SectionHeading";
 
 const items = [
   {
-    icon: BadgeCheck,
     titulo: "Procedência",
     desc: "Histórico claro e informações transparentes sobre cada veículo.",
   },
   {
-    icon: Clock,
     titulo: "Resposta rápida",
     desc: "Atendimento ágil pelo WhatsApp, do primeiro contato à visita.",
   },
   {
-    icon: Wallet,
     titulo: "Condições",
     desc: "Opções de pagamento e financiamento conforme disponibilidade.",
   },
   {
-    icon: Handshake,
     titulo: "Troca",
     desc: "Avaliamos seu usado na negociação, moto ou auto.",
   },
   {
-    icon: Shield,
     titulo: "Confiança",
     desc: "Equipe experiente e foco em uma compra segura.",
   },
   {
-    icon: Sparkles,
     titulo: "Seleção",
     desc: "Motos e automóveis escolhidos para diferentes perfis e bolsos.",
   },
@@ -52,25 +45,17 @@ export function StoreDiferenciais() {
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((d) => {
-            const Icon = d.icon;
-            return (
-              <div
-                key={d.titulo}
-                className="group flex gap-4 rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 transition-all hover:border-[#c41e3a]/40"
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c41e3a]/20 bg-[#c41e3a]/10 transition-all group-hover:border-[#c41e3a] group-hover:bg-[#c41e3a]">
-                  <Icon size={20} className="text-[#c41e3a] transition-colors group-hover:text-white" />
-                </div>
-                <div>
-                  <h3 className="font-display mb-1 text-lg leading-tight font-black text-white uppercase italic">
-                    {d.titulo}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#777]">{d.desc}</p>
-                </div>
-              </div>
-            );
-          })}
+          {items.map((d) => (
+            <div
+              key={d.titulo}
+              className="rounded-2xl border border-[#2a2a2a] bg-[#141414] p-5 transition-all hover:border-[#c41e3a]/40"
+            >
+              <h3 className="font-display mb-1 text-lg leading-tight font-black text-white uppercase italic">
+                {d.titulo}
+              </h3>
+              <p className="text-sm leading-relaxed text-[#777]">{d.desc}</p>
+            </div>
+          ))}
         </div>
 
         {wa ? (

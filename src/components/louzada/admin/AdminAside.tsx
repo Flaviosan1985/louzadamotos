@@ -25,9 +25,10 @@ export function AdminAside({ onLogout }: AdminAsideProps) {
         <ul className="mt-5 divide-y divide-zinc-100 text-left text-sm">
           <li>
             <a
-              href={wa}
+              href={wa ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
+              aria-disabled={!wa}
               className="flex items-center gap-3 py-3 text-zinc-700 transition hover:text-[#E10600]"
             >
               <MessageCircle className="size-4 text-zinc-400" />

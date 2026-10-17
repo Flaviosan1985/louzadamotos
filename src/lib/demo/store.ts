@@ -130,6 +130,7 @@ export function demoUpsertVeiculo(
       renavam: payload.renavam ?? null,
       km: payload.km ?? 0,
       cor: payload.cor ?? null,
+      cilindrada: payload.cilindrada ?? null,
       preco_custo: Number(payload.preco_custo ?? 0),
       preco_venda: Number(payload.preco_venda ?? 0),
       status: payload.status ?? "disponivel",

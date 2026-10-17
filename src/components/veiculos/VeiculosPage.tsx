@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { toast } from "sonner";
 import { removeVeiculo } from "@/lib/data/app-data";
+import { pode } from "@/lib/negocio/permissoes";
 import { filterVeiculos, uniqueMarcas } from "@/lib/veiculos/filter-veiculos";
 import type { StatusVeiculo } from "@/lib/types/database";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { QueryState } from "@/components/shared/QueryState";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { VeiculosFilters } from "@/components/veiculos/VeiculosFilters";
+import { VeiculosGrid } from "@/components/veiculos/VeiculosGrid";
 import { VeiculosTable } from "@/components/veiculos/VeiculosTable";
 import type { VeiculoFiltros } from "@/components/veiculos/types";
 
@@ -30,6 +32,7 @@ export function VeiculosPage({
   lockedStatus?: StatusVeiculo;
 }) {
   const { data, error, loading, refetch } = useAppSnapshot();
+  const [view, setView] = useState<"fotos" | "tabela">("fotos");
   const [filters, setFilters] = useState<VeiculoFiltros>({
     ...emptyFilters,
     status: lockedStatus ?? "todos",
@@ -40,6 +43,7 @@ export function VeiculosPage({
     [filters, debouncedBusca],
   );
 
+  const podeEscrever = data ? pode(data.profile.papel, "comercial.escrever") : false;
   const marcas = useMemo(() => uniqueMarcas(data?.veiculos ?? []), [data]);
   const filtered = useMemo(
     () => filterVeiculos(data?.veiculos ?? [], activeFilters, lockedStatus),
@@ -86,12 +90,28 @@ export function VeiculosPage({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={view === "fotos" ? "default" : "outline"}
+              onClick={() => setView("fotos")}
+            >
+              Fotos
+            </Button>
+            <Button
+              type="button"
+              variant={view === "tabela" ? "default" : "outline"}
+              onClick={() => setView("tabela")}
+            >
+              Tabela
+            </Button>
             <Button variant="outline" nativeButton={false} render={<PanelLink href="/" />}>
               Ver vitrine
             </Button>
-            <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
-              Adicionar veículo
-            </Button>
+            {podeEscrever ? (
+              <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
+                Adicionar veículo
+              </Button>
+            ) : null}
           </div>
         </div>
         {data ? (
@@ -102,14 +122,20 @@ export function VeiculosPage({
             title="Nenhum veículo neste filtro"
             description="Ajuste a busca, o status ou cadastre um veículo no pátio."
             action={
-              <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
-                Adicionar veículo
-              </Button>
+              podeEscrever ? (
+                <Button nativeButton={false} render={<PanelLink href="/veiculos/adicionar" />}>
+                  Adicionar veículo
+                </Button>
+              ) : undefined
             }
           />
         </QueryState.Empty>
         <QueryState.Success>
-          <VeiculosTable veiculos={filtered} onDelete={handleDelete} />
+          {view === "fotos" ? (
+            <VeiculosGrid veiculos={filtered} onDelete={podeEscrever ? handleDelete : undefined} />
+          ) : (
+            <VeiculosTable veiculos={filtered} onDelete={podeEscrever ? handleDelete : undefined} />
+          )}
         </QueryState.Success>
       </div>
       </QueryState.Ready>

@@ -60,6 +60,10 @@ export async function POST(request: Request) {
     price,
     description: String(body.description ?? "").trim(),
     featured: Boolean(body.featured),
+    displacement:
+      body.displacement != null && body.displacement !== ""
+        ? Number(body.displacement)
+        : null,
   });
 
   return Response.json(vehicle, { status: 201 });

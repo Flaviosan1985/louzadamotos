@@ -6,7 +6,7 @@ import type { VehicleWithPhotos } from "@/lib/louzada/types";
 
 export function AdminPhotosTab() {
   const [vehicles, setVehicles] = useState<VehicleWithPhotos[]>([]);
-  const [vehicleId, setVehicleId] = useState<number | null>(null);
+  const [vehicleId, setVehicleId] = useState<number | string | null>(null);
   const [selected, setSelected] = useState<VehicleWithPhotos | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -16,7 +16,7 @@ export function AdminPhotosTab() {
     setVehicles(data);
   }, []);
 
-  const loadVehicle = useCallback(async (id: number) => {
+  const loadVehicle = useCallback(async (id: number | string) => {
     const res = await fetch(`/api/vehicles/${id}`);
     if (res.ok) setSelected((await res.json()) as VehicleWithPhotos);
   }, []);
@@ -82,7 +82,10 @@ export function AdminPhotosTab() {
           <select
             className="h-9 min-w-[240px] rounded-md border px-3 text-sm"
             value={vehicleId ?? ""}
-            onChange={(e) => setVehicleId(Number(e.target.value) || null)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setVehicleId(value ? value : null);
+            }}
           >
             <option value="">Selecione…</option>
             {vehicles.map((v) => (

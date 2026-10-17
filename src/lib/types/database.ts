@@ -34,6 +34,7 @@ export interface Veiculo {
   renavam: string | null;
   km: number;
   cor: string | null;
+  cilindrada: number | null;
   preco_custo: number;
   preco_venda: number;
   status: StatusVeiculo;

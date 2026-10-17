@@ -23,7 +23,7 @@ export function VeiculosTable({
   onDelete,
 }: {
   veiculos: Veiculo[];
-  onDelete: (id: string) => void;
+  onDelete?: (id: string) => void;
 }) {
   return (
     <div className="bg-card rounded-xl border">
@@ -63,9 +63,11 @@ export function VeiculosTable({
                 <Button variant="ghost" size="sm" nativeButton={false} render={<PanelLink href={`/veiculos/${veiculo.id}`} />}>
                   Editar
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => onDelete(veiculo.id)}>
-                  Excluir
-                </Button>
+                {onDelete ? (
+                  <Button variant="ghost" size="sm" onClick={() => onDelete(veiculo.id)}>
+                    Excluir
+                  </Button>
+                ) : null}
               </TableCell>
             </TableRow>
           ))}

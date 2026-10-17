@@ -2,8 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { removeCliente, saveCliente } from "@/lib/data/app-data";
+import { saveCliente } from "@/lib/data/app-data";
 import { filterClientes } from "@/lib/cadastros/filter-clientes";
+import { pode } from "@/lib/negocio/permissoes";
 import type { Cliente } from "@/lib/types/database";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -19,6 +20,8 @@ export function ClientesPage() {
   const [busca, setBusca] = useState("");
   const [editing, setEditing] = useState<Cliente | null | "new">(null);
   const debouncedBusca = useDebounce(busca, 300);
+
+  const podeEscrever = data ? pode(data.profile.papel, "comercial.escrever") : false;
 
   const filtered = useMemo(
     () => filterClientes(data?.clientes ?? [], debouncedBusca),
@@ -51,20 +54,6 @@ export function ClientesPage() {
     [data, editing, refetch],
   );
 
-  const handleDelete = useCallback(
-    async (id: string) => {
-      if (!data) return;
-      try {
-        await removeCliente(id, data.mode === "demo");
-        toast.success("Cliente excluído.");
-        await refetch();
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Falha ao excluir.");
-      }
-    },
-    [data, refetch],
-  );
-
   return (
     <QueryState
       loading={loading && !data}
@@ -81,7 +70,7 @@ export function ClientesPage() {
             <h1 className="text-2xl font-semibold">Clientes</h1>
             <p className="text-muted-foreground text-sm">{filtered.length} cadastro(s)</p>
           </div>
-          <Button onClick={() => setEditing("new")}>Novo cliente</Button>
+          {podeEscrever ? <Button onClick={() => setEditing("new")}>Novo cliente</Button> : null}
         </div>
         <Input
           placeholder="Buscar nome ou documento"
@@ -99,11 +88,16 @@ export function ClientesPage() {
           <EmptyState
             title="Nenhum cliente encontrado"
             description="Cadastre o primeiro cliente da revenda ou limpe a busca."
-            action={<Button onClick={() => setEditing("new")}>Novo cliente</Button>}
+            action={
+              podeEscrever ? <Button onClick={() => setEditing("new")}>Novo cliente</Button> : undefined
+            }
           />
         </QueryState.Empty>
         <QueryState.Success>
-          <ClientesTable clientes={filtered} onEdit={setEditing} onDelete={handleDelete} />
+          <ClientesTable
+            clientes={filtered}
+            onEdit={podeEscrever ? setEditing : undefined}
+          />
         </QueryState.Success>
       </div>
       </QueryState.Ready>

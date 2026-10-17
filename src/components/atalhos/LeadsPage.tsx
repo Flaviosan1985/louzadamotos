@@ -14,6 +14,7 @@ export function LeadsPage() {
         { header: "Nome", render: (row) => row.nome },
         { header: "Telefone", render: (row) => row.telefone },
         { header: "Interesse", render: (row) => row.interesse },
+        { header: "Proposta", render: (row) => row.proposta },
         { header: "Status", render: (row) => row.status },
         { header: "Origem", render: (row) => row.origem },
       ]}

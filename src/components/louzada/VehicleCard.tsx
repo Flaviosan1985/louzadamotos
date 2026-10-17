@@ -2,12 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency, formatKm } from "@/lib/format";
 import type { VehicleWithPhotos } from "@/lib/louzada/types";
-import {
-  buildWhatsAppUrl,
-  vehicleInterestMessage,
-} from "@/lib/louzada/whatsapp";
+import { InterestDialog } from "@/components/louzada/InterestDialog";
 import { SoldRibbon } from "@/components/louzada/SoldRibbon";
-import { WaIcon } from "@/components/louzada/WaIcon";
 
 type VehicleCardProps = {
   vehicle: VehicleWithPhotos;
@@ -15,10 +11,8 @@ type VehicleCardProps = {
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
   const sold = vehicle.status === "vendido";
-  const wa = buildWhatsAppUrl(
-    vehicleInterestMessage(vehicle.brand, vehicle.model, vehicle.year),
-  );
   const imageSrc = vehicle.coverUrl ?? "/logo.jpg";
+  const cc = vehicle.displacement ? ` · ${vehicle.displacement} cc` : "";
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#141414] transition-all duration-200 hover:border-[#c41e3a]/50">
@@ -48,6 +42,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         </h3>
         <p className="text-sm text-[#777]">
           {vehicle.year} · {formatKm(vehicle.km)} · {vehicle.color}
+          {cc}
         </p>
         <p className="font-display text-2xl font-black text-[#c41e3a] italic">
           {formatCurrency(vehicle.price)}
@@ -60,20 +55,19 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
           >
             Ver detalhes
           </Link>
-          {sold || !wa ? (
+          {sold ? (
             <span className="inline-flex flex-1 cursor-not-allowed items-center justify-center rounded-full bg-[#252525] px-4 py-3 text-sm font-semibold text-[#666]">
               Veículo vendido
             </span>
           ) : (
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-bold text-white hover:bg-[#1db954]"
-            >
-              <WaIcon className="h-4 w-4" />
-              Tenho interesse
-            </a>
+            <InterestDialog
+              vehicleId={vehicle.id}
+              brand={vehicle.brand}
+              model={vehicle.model}
+              year={vehicle.year}
+              displacement={vehicle.displacement}
+              triggerClassName="flex-1 px-4 py-3 text-sm"
+            />
           )}
         </div>
       </div>

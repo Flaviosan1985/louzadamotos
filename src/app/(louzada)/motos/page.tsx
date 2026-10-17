@@ -1,6 +1,8 @@
 import { VehicleCatalogSection } from "@/components/louzada/VehicleCatalogSection";
+import { loadVitrineCatalog, listVitrineBrands } from "@/lib/catalog/vitrine.server";
 import { parseFiltersFromSearchParams } from "@/lib/louzada/parse-filters";
-import { listBrands, listVehicles } from "@/lib/louzada/vehicles-repository";
+
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -9,8 +11,8 @@ type PageProps = {
 export default async function MotosPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const filters = parseFiltersFromSearchParams(params, "moto");
-  const vehicles = listVehicles(filters);
-  const brands = listBrands("moto");
+  const vehicles = await loadVitrineCatalog(filters);
+  const brands = listVitrineBrands(vehicles, "moto");
 
   return (
     <div className="pt-20">

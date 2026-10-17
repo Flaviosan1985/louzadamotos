@@ -54,12 +54,9 @@ export function StoreHeader() {
             className="h-10 w-10 rounded-full object-cover sm:h-12 sm:w-12"
             priority
           />
-          <div>
-            <p className="font-display text-base leading-none font-black tracking-wide text-white italic sm:text-lg">
-              LOU<span className="text-[#c41e3a]">ZADA</span>
-            </p>
-            <p className="mt-0.5 text-[9px] tracking-widest text-[#666] uppercase">Motos & Autos</p>
-          </div>
+          <p className="font-display text-base leading-none font-black tracking-wide text-white italic sm:text-lg">
+            LOU<span className="text-[#c41e3a]">ZADA</span>
+          </p>
         </Link>
 
         <nav className="hidden items-center gap-5 xl:gap-7 lg:flex" aria-label="Principal">

@@ -8,7 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { adminCardClass } from "@/lib/louzada/admin-theme";
 
-export function AdminLoginForm() {
+type AdminLoginFormProps = {
+  defaultNext?: string;
+};
+
+export function AdminLoginForm({ defaultNext = "/painel" }: AdminLoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user, setUser] = useState("");
@@ -30,7 +34,7 @@ export function AdminLoginForm() {
       setError("Usuário ou senha inválidos.");
       return;
     }
-    const next = searchParams.get("next") || "/admin";
+    const next = searchParams.get("next") || defaultNext;
     router.push(next);
     router.refresh();
   }

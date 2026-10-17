@@ -11,6 +11,8 @@ import Image from "next/image";
 import { navItems } from "@/configs/navConfig";
 import { themeConfig } from "@/configs/themeConfig";
 import { emptySearchParams, getActiveBranchKeys } from "@/lib/nav";
+import { filtrarNav } from "@/lib/negocio/permissoes";
+import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { PanelLink } from "@/components/layout/panel/PanelLink";
 import { usePanelNav } from "@/components/layout/panel/PanelNavProvider";
 import {
@@ -28,12 +30,17 @@ import { SidebarNavGroup } from "@/components/layout/sidebar/SidebarNavGroup";
 
 export function Sidebar() {
   const { pathname } = usePanelNav();
+  const { data } = useAppSnapshot();
   const { state, isMobile } = useSidebar();
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+  const menu = useMemo(
+    () => (data ? filtrarNav(navItems, data.profile.papel) : navItems),
+    [data],
+  );
 
   const activeBranchKeys = useMemo(
-    () => getActiveBranchKeys(navItems, pathname, emptySearchParams),
-    [pathname],
+    () => getActiveBranchKeys(menu, pathname, emptySearchParams),
+    [menu, pathname],
   );
 
   const isBranchOpen = useCallback(
@@ -84,7 +91,7 @@ export function Sidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:overflow-y-auto">
-        {navItems.map((navItem, index) => (
+        {menu.map((navItem, index) => (
           <SidebarNavGroup
             key={navItem.groupLabel || index}
             data={navItem.items}

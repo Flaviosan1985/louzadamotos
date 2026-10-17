@@ -53,6 +53,12 @@ export async function PUT(request: Request, context: RouteContext) {
     patch.status = body.status as VehicleStatus;
   }
   if (body.featured != null) patch.featured = Boolean(body.featured);
+  if (body.displacement !== undefined) {
+    patch.displacement =
+      body.displacement != null && body.displacement !== ""
+        ? Number(body.displacement)
+        : null;
+  }
 
   const vehicle = updateVehicle(id, patch);
   if (!vehicle) {

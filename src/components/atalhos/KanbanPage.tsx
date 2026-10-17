@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { removeModuleRow, saveModuleRow, saveVeiculo } from "@/lib/data/app-data";
 import { useAppSnapshot } from "@/hooks/use-app-snapshot";
 import { aplicarTransicao, ETAPAS, normalizarEtapa, validarTransicao, type Etapa } from "@/lib/negocio/funil";
+import { pode } from "@/lib/negocio/permissoes";
 import { Button } from "@/components/ui/button";
 import { QueryState } from "@/components/shared/QueryState";
 import { ModuleHeader } from "@/components/shared/ModuleHeader";
@@ -21,6 +22,7 @@ export function KanbanPage() {
   const { data, error, loading, refetch } = useAppSnapshot();
   const [creating, setCreating] = useState(false);
   const [pendente, setPendente] = useState<Pendente | null>(null);
+  const podeEscrever = data ? pode(data.profile.papel, "comercial.escrever") : false;
   const cards = useMemo(() => data?.extras.kanban ?? [], [data?.extras.kanban]);
   const veiculos = useMemo(() => data?.veiculos ?? [], [data?.veiculos]);
 
@@ -35,7 +37,7 @@ export function KanbanPage() {
 
   const mover = useCallback(
     async (card: ModuleRow, destino: Etapa) => {
-      if (!data) return;
+      if (!data || !pode(data.profile.papel, "comercial.escrever")) return;
       const placa = veiculos.find((v) => v.id === card.veiculo_id)?.placa ?? null;
       const falha = validarTransicao(card, destino, { placaDoVeiculo: placa });
       if (falha) {
@@ -105,12 +107,14 @@ export function KanbanPage() {
           <ModuleHeader
             title="Funil de vendas"
             count={`${cards.length} cartão(ões)`}
-            action={<Button onClick={() => setCreating(true)}>Novo lead</Button>}
+            action={
+              podeEscrever ? <Button onClick={() => setCreating(true)}>Novo lead</Button> : undefined
+            }
           />
           <p className="text-muted-foreground -mt-3 text-sm">
             Negociação exige test drive; venda exige veículo com placa e data de entrega; perda exige motivo.
           </p>
-          {creating ? (
+          {creating && podeEscrever ? (
             <EntityForm
               submitLabel="Salvar"
               onCancel={() => setCreating(false)}
@@ -131,6 +135,7 @@ export function KanbanPage() {
                 cards={column.cards}
                 onMove={(row, destino) => void mover(row, destino)}
                 onDelete={(id) => void handleDelete(id)}
+                somenteLeitura={!podeEscrever}
               />
             ))}
           </div>

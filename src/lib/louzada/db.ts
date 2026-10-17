@@ -8,6 +8,30 @@ const DB_PATH = path.join(DATA_DIR, "louzada.db");
 
 let db: Database.Database | null = null;
 
+function columnExists(database: Database.Database, table: string, column: string) {
+  const rows = database.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  return rows.some((row) => row.name === column);
+}
+
+function migrate(database: Database.Database) {
+  if (!columnExists(database, "vehicles", "displacement")) {
+    database.exec(`ALTER TABLE vehicles ADD COLUMN displacement INTEGER`);
+  }
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS vehicle_leads (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vehicle_id INTEGER NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+      customer_name TEXT NOT NULL DEFAULT '',
+      phone TEXT NOT NULL,
+      message TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_leads_vehicle ON vehicle_leads(vehicle_id);
+    CREATE INDEX IF NOT EXISTS idx_leads_created ON vehicle_leads(created_at);
+  `);
+}
+
 function initSchema(database: Database.Database) {
   database.exec(`
     CREATE TABLE IF NOT EXISTS vehicles (
@@ -22,6 +46,7 @@ function initSchema(database: Database.Database) {
       description TEXT NOT NULL DEFAULT '',
       status TEXT NOT NULL DEFAULT 'disponivel' CHECK(status IN ('disponivel', 'vendido')),
       featured INTEGER NOT NULL DEFAULT 0,
+      displacement INTEGER,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
@@ -36,6 +61,7 @@ function initSchema(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_vehicles_type ON vehicles(type);
     CREATE INDEX IF NOT EXISTS idx_photos_vehicle ON photos(vehicle_id);
   `);
+  migrate(database);
 }
 
 export function getDb() {

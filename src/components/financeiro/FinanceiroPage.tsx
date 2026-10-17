@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { saveFinanceiro } from "@/lib/data/app-data";
+import { pode } from "@/lib/negocio/permissoes";
 import { filterLancamentos } from "@/lib/financeiro/filter-lancamentos";
 import { todayISO } from "@/lib/format";
 import type { LancamentoFinanceiro, StatusFinanceiro } from "@/lib/types/database";
@@ -25,7 +26,7 @@ export function FinanceiroPage({ title }: { title: string }) {
 
   const handleToggle = useCallback(
     async (item: LancamentoFinanceiro) => {
-      if (!data) return;
+      if (!data || !pode(data.profile.papel, "financeiro.acessar")) return;
       try {
         const pago = item.status !== "pago";
         await saveFinanceiro(

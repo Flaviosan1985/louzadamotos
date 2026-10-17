@@ -2,12 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency, formatKm } from "@/lib/format";
 import type { VehicleWithPhotos } from "@/lib/louzada/types";
-import {
-  buildWhatsAppUrl,
-  vehicleInterestMessage,
-} from "@/lib/louzada/whatsapp";
+import { publicPhotoSrc } from "@/lib/catalog/from-dashboard";
+import { InterestDialog } from "@/components/louzada/InterestDialog";
 import { SoldRibbon } from "@/components/louzada/SoldRibbon";
-import { WaIcon } from "@/components/louzada/WaIcon";
 
 type VehicleDetailViewProps = {
   vehicle: VehicleWithPhotos;
@@ -15,13 +12,11 @@ type VehicleDetailViewProps = {
 
 export function VehicleDetailView({ vehicle }: VehicleDetailViewProps) {
   const sold = vehicle.status === "vendido";
-  const wa = buildWhatsAppUrl(
-    vehicleInterestMessage(vehicle.brand, vehicle.model, vehicle.year),
-  );
   const photos =
     vehicle.photos.length > 0
-      ? vehicle.photos.map((p) => `/api/uploads/${encodeURIComponent(p.filename)}`)
+      ? vehicle.photos.map((photo) => publicPhotoSrc(photo.filename))
       : ["/logo.jpg"];
+  const cc = vehicle.displacement ? ` · ${vehicle.displacement} cc` : "";
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-28">
@@ -70,6 +65,7 @@ export function VehicleDetailView({ vehicle }: VehicleDetailViewProps) {
           </h1>
           <p className="mt-2 text-[#888]">
             {vehicle.year} · {formatKm(vehicle.km)} · Cor {vehicle.color}
+            {cc}
           </p>
           <p className="font-display mt-4 text-3xl font-black text-[#c41e3a] italic">
             {formatCurrency(vehicle.price)}
@@ -81,20 +77,19 @@ export function VehicleDetailView({ vehicle }: VehicleDetailViewProps) {
           </p>
 
           <div className="mt-8">
-            {sold || !wa ? (
+            {sold ? (
               <span className="inline-flex rounded-full bg-[#252525] px-6 py-4 text-sm font-semibold text-[#666]">
                 Veículo vendido
               </span>
             ) : (
-              <a
-                href={wa}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-[#c41e3a] px-8 py-4 text-base font-black text-white hover:bg-[#e52222]"
-              >
-                <WaIcon />
-                Chamar no WhatsApp
-              </a>
+              <InterestDialog
+                vehicleId={vehicle.id}
+                brand={vehicle.brand}
+                model={vehicle.model}
+                year={vehicle.year}
+                displacement={vehicle.displacement}
+                triggerClassName="px-8 py-4 text-base font-black"
+              />
             )}
           </div>
 

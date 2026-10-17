@@ -32,6 +32,7 @@ export function veiculoToPublic(veiculo: Veiculo): VehicleWithPhotos {
     color: veiculo.cor ?? "",
     price: veiculo.preco_venda,
     description: veiculo.observacoes ?? "",
+    displacement: veiculo.cilindrada ?? null,
     status: veiculo.status === "vendido" ? "vendido" : "disponivel",
     featured: 0,
     created_at: veiculo.criado_em,

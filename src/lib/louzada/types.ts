@@ -13,6 +13,7 @@ export type Vehicle = {
   description: string;
   status: VehicleStatus;
   featured: number;
+  displacement: number | null;
   created_at: string;
 };
 
