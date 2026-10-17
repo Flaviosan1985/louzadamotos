@@ -29,6 +29,10 @@
 .venv-crewai/
 scripts/__pycache__/
 *.py[cod]
+/funcao_criada.py
+
+# referências locais (evita sub-repos acidentais no Git)
+.reference/
 
 # misc
 .DS_Store

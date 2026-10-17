@@ -82,3 +82,22 @@ Tabela `vehicle_leads` já está no D1. Próximo passo: mover `POST /api/leads` 
 - [ ] Apontar `LOUZADA_BACKEND=cloudflare`
 - [ ] Testar login, upload, vitrine pública, troca de senha
 - [ ] Desligar `ADMIN_USER` em produção
+
+## 9. Cloudflare Pages (GitHub)
+
+Se aparecer **`error occurred while fetching repository`**:
+
+1. GitHub → **Settings → Applications → Installed GitHub Apps → Cloudflare Workers and Pages** → inclua **`louzadamotos`** em *Repository access*.
+2. Cloudflare → **Workers & Pages** → projeto → **Settings → Builds** → **Reconnect** → repo `Flaviosan1985/louzadamotos`, branch **`main`**.
+3. **Retry deployment** (ou aguarde o push na `main`).
+
+Configuração inicial do build (ajuste depois para adapter Next.js na Cloudflare):
+
+| Campo | Valor |
+|--------|--------|
+| Production branch | `main` |
+| Root directory | `/` |
+| Build command | `npm ci && npm run build` |
+| Node.js version | 20 ou 22 (Environment variables: `NODE_VERSION=20`) |
+
+**Produção:** `better-sqlite3` não roda no edge — use `LOUZADA_BACKEND=cloudflare` + Worker/D1/R2 ou Hyperdrive. Variáveis mínimas no Pages: `SESSION_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `LOUZADA_BACKEND`, `CLOUDFLARE_API_URL`.
