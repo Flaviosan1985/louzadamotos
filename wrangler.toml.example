@@ -1,0 +1,24 @@
+# Exemplo para deploy Next.js na Cloudflare (OpenNext) + vitrine KV.
+# Copie para wrangler.toml e preencha os IDs.
+name = "admycar"
+compatibility_date = "2026-10-17"
+
+[[kv_namespaces]]
+binding = "VITRINE_KV"
+id = "COLE_O_KV_NAMESPACE_ID"
+preview_id = "COLE_O_PREVIEW_KV_ID"
+
+# Opcional: fotos / API Louzada legada
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "louzada-db"
+# database_id = "COLE_O_DATABASE_ID"
+
+[vars]
+VITRINE_DISABLE_FILE = "1"
+
+[observability]
+enabled = true
+
+[observability.traces]
+enabled = true

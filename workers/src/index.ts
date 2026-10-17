@@ -17,6 +17,22 @@ function parseId(value: string | undefined): number | null {
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
+function matchVehiclePhotos(pathname: string) {
+  return pathname.match(/^\/(?:vehicles|veiculos)\/(\d+)\/photos$/);
+}
+
+function matchPhotoUrl(pathname: string) {
+  return pathname.match(/^\/(?:photos|fotos)\/(\d+)\/url$/);
+}
+
+function matchPhotoDelete(pathname: string) {
+  return pathname.match(/^\/(?:photos|fotos)\/(\d+)$/);
+}
+
+function matchPublicPhoto(pathname: string) {
+  return pathname.match(/^\/public\/(?:photos|fotos)\/(\d+)$/);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -41,37 +57,37 @@ export default {
       return handleChangePassword(request, env);
     }
 
-    if (method === "GET" && pathname === "/public/vehicles") {
+    if (method === "GET" && (pathname === "/public/vehicles" || pathname === "/public/veiculos")) {
       return handleListPublicVehicles(request, env);
     }
 
-    let match = pathname.match(/^\/vehicles\/(\d+)\/photos$/);
+    let match = matchVehiclePhotos(pathname);
     if (match) {
-      const vehicleId = parseId(match[1]);
-      if (!vehicleId) return json({ error: "ID inválido" }, { status: 400 });
-      if (method === "GET") return handleListVehiclePhotos(request, env, vehicleId);
-      if (method === "POST") return handleUploadVehiclePhoto(request, env, vehicleId);
+      const veiculoId = parseId(match[1]);
+      if (!veiculoId) return json({ error: "ID inválido" }, { status: 400 });
+      if (method === "GET") return handleListVehiclePhotos(request, env, veiculoId);
+      if (method === "POST") return handleUploadVehiclePhoto(request, env, veiculoId);
     }
 
-    match = pathname.match(/^\/photos\/(\d+)\/url$/);
+    match = matchPhotoUrl(pathname);
     if (method === "GET" && match) {
-      const photoId = parseId(match[1]);
-      if (!photoId) return json({ error: "ID inválido" }, { status: 400 });
-      return handlePresignedPhotoUrl(request, env, photoId);
+      const fotoId = parseId(match[1]);
+      if (!fotoId) return json({ error: "ID inválido" }, { status: 400 });
+      return handlePresignedPhotoUrl(request, env, fotoId);
     }
 
-    match = pathname.match(/^\/photos\/(\d+)$/);
+    match = matchPhotoDelete(pathname);
     if (method === "DELETE" && match) {
-      const photoId = parseId(match[1]);
-      if (!photoId) return json({ error: "ID inválido" }, { status: 400 });
-      return handleDeletePhoto(request, env, photoId);
+      const fotoId = parseId(match[1]);
+      if (!fotoId) return json({ error: "ID inválido" }, { status: 400 });
+      return handleDeletePhoto(request, env, fotoId);
     }
 
-    match = pathname.match(/^\/public\/photos\/(\d+)$/);
+    match = matchPublicPhoto(pathname);
     if (method === "GET" && match) {
-      const photoId = parseId(match[1]);
-      if (!photoId) return json({ error: "ID inválido" }, { status: 400 });
-      return handlePublicPhotoProxy(request, env, photoId);
+      const fotoId = parseId(match[1]);
+      if (!fotoId) return json({ error: "ID inválido" }, { status: 400 });
+      return handlePublicPhotoProxy(request, env, fotoId);
     }
 
     return json({ error: "Rota não encontrada" }, { status: 404 });

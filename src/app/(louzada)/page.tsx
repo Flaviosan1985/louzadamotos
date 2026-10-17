@@ -7,7 +7,7 @@ import { VehicleCatalogSection } from "@/components/louzada/VehicleCatalogSectio
 import { loadVitrineCatalog, listVitrineBrands } from "@/lib/catalog/vitrine.server";
 import { parseFiltersFromSearchParams } from "@/lib/louzada/parse-filters";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

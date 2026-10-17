@@ -2,7 +2,7 @@ import Link from "next/link";
 import { VehicleDetailView } from "@/components/louzada/VehicleDetailView";
 import { getVitrineVehicleById } from "@/lib/catalog/vitrine.server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type PageProps = {
   params: Promise<{ id: string }>;

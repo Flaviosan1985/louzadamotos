@@ -6,7 +6,7 @@ Back-end serverless para migrar o Louzada Motos off Supabase/local SQLite.
 
 | Recurso | Cloudflare |
 |--------|------------|
-| Dados | **D1** (`schema/0001_auth.sql`, `0002_louzada.sql`) |
+| Dados | **D1** (`schema/louzada_d1.sql` — `usuarios`, `veiculos`, `fotos`) |
 | Fotos | **R2** (bucket privado) |
 | API | **Workers** (`src/index.ts`) |
 
@@ -16,7 +16,14 @@ Back-end serverless para migrar o Louzada Motos off Supabase/local SQLite.
 cd workers
 cp wrangler.toml.example wrangler.toml
 npm install
-npm run db:migrate          # D1 local
+
+# 1) Criar banco na Cloudflare (uma vez; copie database_id para wrangler.toml)
+npm run db:create
+
+# 2) Aplicar schema
+npm run db:apply:local      # dev local
+npm run db:apply:remote     # produção
+
 npm run dev
 ```
 
@@ -50,11 +57,13 @@ npm run deploy
 | POST | `/auth/login` | — |
 | GET | `/me` | JWT |
 | POST | `/me/password` | JWT |
-| GET | `/public/vehicles` | — |
-| GET/POST | `/vehicles/:id/photos` | JWT |
-| GET | `/photos/:id/url` | JWT (presigned) |
-| DELETE | `/photos/:id` | JWT |
-| GET | `/public/photos/:id` | — (veículo disponível) |
+| GET | `/public/vehicles` ou `/public/veiculos` | — |
+| GET/POST | `/vehicles/:id/photos` ou `/veiculos/:id/fotos` | JWT |
+| GET | `/photos/:id/url` ou `/fotos/:id/url` | JWT (presigned) |
+| DELETE | `/photos/:id` ou `/fotos/:id` | JWT |
+| GET | `/public/photos/:id` ou `/public/fotos/:id` | — (status **Disponível**) |
+
+Tabelas D1: `usuarios`, `veiculos`, `fotos` (`schema/louzada_d1.sql`).
 
 JWT: header `Authorization: Bearer …` ou cookie `louzada_token`.
 

@@ -1,11 +1,15 @@
 import { signAccessToken } from "../auth/jwt";
 import { hashPassword, verifyPassword } from "../crypto/password";
-import { createUser, findUserByEmail } from "../db/users";
+import { createUsuario, findUsuarioByEmail } from "../db/usuarios";
 import type { Env } from "../types/env";
 import { badRequest, json, unauthorized } from "../utils/http";
 
 type RegisterBody = { email?: string; password?: string };
 type LoginBody = { email?: string; password?: string };
+
+function authUserFromDb(user: { id: string; email: string }) {
+  return { userId: user.id, email: user.email, role: "admin" as const };
+}
 
 export async function handleRegister(request: Request, env: Env) {
   let body: RegisterBody;
@@ -21,20 +25,20 @@ export async function handleRegister(request: Request, env: Env) {
     return badRequest("Informe email e senha (mín. 8 caracteres)");
   }
 
-  const existing = await findUserByEmail(env, email);
+  const existing = await findUsuarioByEmail(env, email);
   if (existing) {
     return badRequest("Email já cadastrado");
   }
 
-  const passwordHash = await hashPassword(password);
-  const user = await createUser(env, { email, passwordHash });
-  const token = await signAccessToken(env, {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  });
+  const senhaHash = await hashPassword(password);
+  const user = await createUsuario(env, { email, senhaHash });
+  const authUser = authUserFromDb(user);
+  const token = await signAccessToken(env, authUser);
 
-  return json({ token, user: { id: user.id, email: user.email, role: user.role } }, { status: 201 });
+  return json(
+    { token, user: { id: user.id, email: user.email, role: authUser.role } },
+    { status: 201 },
+  );
 }
 
 export async function handleLogin(request: Request, env: Env) {
@@ -51,19 +55,16 @@ export async function handleLogin(request: Request, env: Env) {
     return badRequest("Informe email e senha");
   }
 
-  const user = await findUserByEmail(env, email);
-  if (!user || !(await verifyPassword(password, user.password_hash))) {
+  const user = await findUsuarioByEmail(env, email);
+  if (!user || !(await verifyPassword(password, user.senha_hash))) {
     return unauthorized("Email ou senha inválidos");
   }
 
-  const token = await signAccessToken(env, {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  });
+  const authUser = authUserFromDb(user);
+  const token = await signAccessToken(env, authUser);
 
   return json({
     token,
-    user: { id: user.id, email: user.email, role: user.role },
+    user: { id: user.id, email: user.email, role: authUser.role },
   });
 }

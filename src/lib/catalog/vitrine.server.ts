@@ -1,79 +1,38 @@
-import fs from "node:fs";
-import path from "node:path";
+import { unstable_cache } from "next/cache";
 import { listPublicFromDashboard } from "@/lib/catalog/from-dashboard";
+import { getCloudflareEnv, readVitrineFromKv } from "@/lib/catalog/vitrine-cloudflare";
+import { VITRINE_CACHE_TAG } from "@/lib/catalog/vitrine-keys";
 import { demoVeiculos } from "@/lib/demo/seed";
 import type { VehicleListFilters, VehicleWithPhotos } from "@/lib/louzada/types";
-import { createClient } from "@/lib/supabase/server";
-import { getSupabaseEnv } from "@/lib/supabase/env";
 import type { Veiculo } from "@/lib/types/database";
 
-const SNAPSHOT_PATH = path.join(process.cwd(), "data", "vitrine-snapshot.json");
-
-function mapVeiculo(row: Veiculo): Veiculo {
-  return {
-    ...row,
-    preco_custo: Number(row.preco_custo),
-    preco_venda: Number(row.preco_venda),
-    km: Number(row.km),
-    cilindrada: row.cilindrada == null ? null : Number(row.cilindrada),
-    fotos: row.fotos ?? [],
-  };
+function devFallbackVeiculos(): Veiculo[] {
+  return structuredClone(demoVeiculos).filter((v) => v.status !== "reservado");
 }
 
-export function readVitrineSnapshotFile(): Veiculo[] {
-  try {
-    if (fs.existsSync(SNAPSHOT_PATH)) {
-      const raw = JSON.parse(fs.readFileSync(SNAPSHOT_PATH, "utf8")) as Veiculo[];
-      if (Array.isArray(raw) && raw.length > 0) {
-        return raw.map(mapVeiculo);
-      }
-    }
-  } catch {
-    // fallback abaixo
+/** Leitura direta do KV (sem cache Next). Fora da CF, usa seed demo apenas em development. */
+export async function loadVitrineVeiculosUncached(): Promise<Veiculo[]> {
+  const cf = await getCloudflareEnv();
+  if (cf?.VITRINE_KV) {
+    const fromKv = await readVitrineFromKv(cf.VITRINE_KV);
+    if (fromKv?.length) return fromKv;
   }
-  return structuredClone(demoVeiculos);
-}
 
-export function writeVitrineSnapshotFile(veiculos: Veiculo[]) {
-  fs.mkdirSync(path.dirname(SNAPSHOT_PATH), { recursive: true });
-  fs.writeFileSync(SNAPSHOT_PATH, JSON.stringify(veiculos.map(mapVeiculo), null, 2), "utf8");
-}
-
-async function loadFromSupabase(): Promise<Veiculo[] | null> {
-  const env = getSupabaseEnv();
-  if (!env.isConfigured) return null;
-
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("veiculos")
-      .select("*")
-      .in("status", ["disponivel", "vendido"])
-      .order("criado_em", { ascending: false });
-
-    if (error || !data) return null;
-    return (data as Veiculo[]).map(mapVeiculo);
-  } catch {
-    return null;
+  if (process.env.NODE_ENV === "development") {
+    return devFallbackVeiculos();
   }
+
+  return [];
 }
 
-/** Estoque publicado no site — mesma fonte do painel Admycar. */
+const loadVitrineVeiculosCached = unstable_cache(
+  async () => loadVitrineVeiculosUncached(),
+  ["vitrine-veiculos"],
+  { tags: [VITRINE_CACHE_TAG], revalidate: 3600 },
+);
+
 export async function loadVitrineVeiculos(): Promise<Veiculo[]> {
-  if (fs.existsSync(SNAPSHOT_PATH)) {
-    try {
-      const raw = JSON.parse(fs.readFileSync(SNAPSHOT_PATH, "utf8")) as Veiculo[];
-      if (Array.isArray(raw) && raw.length > 0) {
-        return raw.map(mapVeiculo);
-      }
-    } catch {
-      // tenta Supabase / seed
-    }
-  }
-
-  const fromDb = await loadFromSupabase();
-  if (fromDb && fromDb.length > 0) return fromDb;
-  return structuredClone(demoVeiculos);
+  return loadVitrineVeiculosCached();
 }
 
 export async function loadVitrineCatalog(filters: VehicleListFilters = {}): Promise<VehicleWithPhotos[]> {
